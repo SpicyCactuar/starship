@@ -1,127 +1,125 @@
-// Canvas to draw on
-var canvas;
+class Starship {
 
-// WebGL context
-var gl;
+    constructor() {
+		// Initialize necessary rendering dependencies
+		this.prog = createShaderProgram(starshipVS, starshipFS)
+		this.mvpLoc = gl.getUniformLocation(this.prog, 'mvp')
+		
+		this.posLoc = gl.getAttribLocation(this.prog, 'pos')		
+		this.positionBuffer = gl.createBuffer()
 
-// Drawers
-var starshipDrawer;
+		this.colLoc = gl.getAttribLocation(this.prog, 'col')
+		this.colorBuffer = gl.createBuffer()
 
-// Camera
-var camera;
+		this.translation = [0.0, 0.0, 0.0]
+		this.rotations = [0.0, 0.0, 0.0]
+		this.scale = [1.0, 1.0, 1.0]
 
-// When window loads, perform all steps to initialize & draw the WebGL scene
-window.onload = function() {
-	initializeWebGL()
-    initializeScene()
-    updateCanvasSize()
-	drawScene()
-}
+		this.updateWorldTransform()
+        
+		// Updates mesh
+        this.updateMeshData()
+    }
 
-// Initializes canvas & webGl context
-function initializeWebGL() {
-	canvas = document.getElementById("canvas")
-    // Disables right click context menu
-	canvas.oncontextmenu = function() { return false }
+	updateWorldTransform() {
+		let rotMatrix = calculateRotationMatrix(this.rotations[0], this.rotations[1], this.rotations[2])
 
-	gl = canvas.getContext("webgl", { antialias: false, depth: true })
-	if (!gl) {
-		alert("Failed to initialize WebGL. Check your browser & settings compatibility.")
-		return
+		this.worldTransform = [
+			rotMatrix[0] * this.scale[0], rotMatrix[1] * this.scale[0], rotMatrix[2] * this.scale[0], 0.0,
+			rotMatrix[4] * this.scale[1], rotMatrix[5] * this.scale[1], rotMatrix[6] * this.scale[1], 0.0,
+			rotMatrix[8] * this.scale[2], rotMatrix[9] * this.scale[2], rotMatrix[10] * this.scale[2], 0.0,
+			this.translation[0], this.translation[1], this.translation[2], 1.0
+		]
+	}
+
+	updateMeshData() {
+        var meshVertices = [
+            0.0,  1.0, 0.0,
+            1.0, -1.0, 0.0,
+            -1.0, -1.0, 0.0
+        ];
+
+		var vertexColors = [
+			1.0, 0.0, 0.0, 1.0,
+			0.0, 1.0, 0.0, 1.0,
+			0.0, 0.0, 1.0, 1.0
+		]
+        
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshVertices), gl.STATIC_DRAW);		
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexColors), gl.STATIC_DRAW);
+	}
+
+	setRotation(degX, degY, degZ) {
+		this.rotations = [degX, degY, degZ]
+		this.updateWorldTransform()
+	}
+
+	setTranslation(x, y, z) { 
+		this.translation = [x, y, z]
+		this.updateWorldTransform()
+	}
+
+	setScale(scaleX, scaleY, scaleZ) {
+		this.scale = [scaleX, scaleY, scaleZ]
+		this.updateWorldTransform()
+	}
+
+	onModelViewProjectionUpdated(mvp) {
+		// Update model-view-projection matrix
+		mvp = matrixMultiply(mvp, this.worldTransform)
+		
+		// Set mvp matrix value in shaders
+		gl.useProgram(this.prog);
+		gl.uniformMatrix4fv(this.mvpLoc, false, mvp);
 	}
 	
-	gl.clearColor(0.0, 0.0, 0.0, 0.0)
-	gl.enable(gl.DEPTH_TEST)
-}
+	draw() {
+		gl.useProgram(this.prog);
 
-// Initializes scene objects
-function initializeScene() {
-    starshipDrawer = new StarshipDrawer()
-	camera = new Camera()
-}
+		// Enables position attribute as a vec3
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+	    gl.vertexAttribPointer(this.posLoc, 3, gl.FLOAT, false, 0, 0);
+	    gl.enableVertexAttribArray(this.posLoc);
 
-// Updates canvas size & redraws scene
-function windowResize() {
-	updateCanvasSize()
-	drawScene()
-}
-
-function updateCanvasSize() {
-	// Calculate viewport size
-	canvas.style.width  = "100%"
-	canvas.style.height = "100%"
-
-	const pixelRatio = window.devicePixelRatio || 1
-	canvas.width     = pixelRatio * canvas.clientWidth
-	canvas.height    = pixelRatio * canvas.clientHeight
-
-	const width  = (canvas.width  / pixelRatio)
-	const height = (canvas.height / pixelRatio)
-
-	canvas.style.width  = width  + 'px'
-	canvas.style.height = height + 'px'
-
-	// Set WebGL to match viewport size
-	gl.viewport(0, 0, canvas.width, canvas.height)
-
-	// Upon resizing canvas, notify scene objects
-    notifyViewportUpdated(width, height)
-}
-
-function drawScene() {
-	// Clear WebGL color buffers
-    gl.clear(gl.COLOR_BUFFER_BIT);
-	// TODO: Check wether we need to clear Depth buffers as well
-
-    starshipDrawer.draw()
-}
-
-function notifyViewportUpdated(width, height) {
-	// TODO: Include viewport matrix in the calculation
-	let mvp = camera.getProjectionMatrix()
-	console.log(mvp)
-    starshipDrawer.onModelViewProjectionUpdated(mvp)
-}
-
-// Game loop
-setInterval( function() {
-    // TODO: Implement
-}, 15 );
-
-// Compiles vsSource and fsSource as vertex & fragment shaders respectively
-// Returns the associated program
-function createShaderProgram(vsSource, fsSource, wgl=gl)
-{
-	// Compile each shader separately
-	const vs = compileShader(wgl.VERTEX_SHADER, vsSource, wgl)
-	const fs = compileShader(wgl.FRAGMENT_SHADER, fsSource, wgl)
-
-	// Create & attach shaders to program
-	const prog = wgl.createProgram()
-	wgl.attachShader(prog, vs)
-	wgl.attachShader(prog, fs)
-	wgl.linkProgram(prog)
-
-	if (!wgl.getProgramParameter(prog, wgl.LINK_STATUS)) {
-		alert('Failed to initialize shader program: ' + wgl.getProgramInfoLog(prog))
-		return null
+		// Enables vertex color attribute as a vec4
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+		gl.vertexAttribPointer(this.colLoc, 4, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(this.colLoc);
+	
+		// Draw triangles
+		gl.drawArrays(gl.TRIANGLES, 0, 3);
 	}
-	return prog
+
+    update() {
+        // TODO: Implement
+    }
+
 }
 
-// Compile a shader source of type gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
-function compileShader(type, source)
-{
-	// Creates & compiles shader
-	const shader = gl.createShader(type)
-	gl.shaderSource(shader, source)
-	gl.compileShader(shader)
+// Vertex Shader
+var starshipVS = `
+	attribute vec3 pos;
+	attribute vec4 col;
+	varying vec4 vcolor;
 
-	// Checks successful shader compilation
-	if (!gl.getShaderParameter( shader, gl.COMPILE_STATUS)) {
-		alert('Failed to compile shader:' + gl.getShaderInfoLog(shader))
-		gl.deleteShader(shader)
-		return null
+	uniform mat4 mvp;
+	
+	void main() { 
+		gl_Position =  mvp * vec4(pos, 1.0);
+		vcolor = col;
 	}
-	return shader
-}
+`;
+
+// Fragment Shader
+var starshipFS = `
+	precision mediump float;
+	
+	varying vec4 vcolor;
+
+	void main() {
+		gl_FragColor = vcolor;
+	}
+`;
