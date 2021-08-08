@@ -1,10 +1,14 @@
 // Canvas to draw on
 var canvas;
+
 // WebGL context
 var gl;
 
 // Drawers
 var starshipDrawer;
+
+// Camera
+var camera;
 
 // When window loads, perform all steps to initialize & draw the WebGL scene
 window.onload = function() {
@@ -33,6 +37,7 @@ function initializeWebGL() {
 // Initializes scene objects
 function initializeScene() {
     starshipDrawer = new StarshipDrawer()
+	camera = new Camera()
 }
 
 // Updates canvas size & redraws scene
@@ -72,7 +77,10 @@ function drawScene() {
 }
 
 function notifyViewportUpdated(width, height) {
-    starshipDrawer.onViewportUpdated(width, height)
+	// TODO: Include viewport matrix in the calculation
+	let mvp = camera.getProjectionMatrix()
+	console.log(mvp)
+    starshipDrawer.onModelViewProjectionUpdated(mvp)
 }
 
 // Game loop
