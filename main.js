@@ -32,6 +32,8 @@ function initializeWebGL() {
 	
 	gl.clearColor(0.0, 0.0, 0.0, 0.0)
 	gl.enable(gl.DEPTH_TEST)
+	gl.enable(gl.CULL_FACE)
+	gl.cullFace(gl.BACK)
 }
 
 // Initializes scene objects
@@ -69,9 +71,8 @@ function updateCanvasSize() {
 }
 
 function drawScene() {
-	// Clear WebGL color buffers
-    gl.clear(gl.COLOR_BUFFER_BIT);
-	// TODO: Check wether we need to clear Depth buffers as well
+	// Clear WebGL buffers
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     starship.draw()
 }
@@ -79,14 +80,15 @@ function drawScene() {
 function notifyViewportUpdated(width, height) {
 	// TODO: Include viewport matrix in the calculation
 	let mvp = camera.getProjectionMatrix()
-	console.log(mvp)
+	//console.log(mvp)
     starship.onModelViewProjectionUpdated(mvp)
 }
 
 // Game loop
 setInterval( function() {
-    // TODO: Implement
-}, 15 );
+	notifyViewportUpdated()
+    drawScene()
+}, 16 );
 
 // Compiles vsSource and fsSource as vertex & fragment shaders respectively
 // Returns the associated program

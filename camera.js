@@ -1,20 +1,24 @@
 class Camera {
 
     constructor() {
-        this.center = [0.0, 0.0, -2.0]
-        this.near = 1
-        this.far = -1
-        this.right = 1
-        this.left = -1
-        this.top = 1
-        this.bottom = -1
+        this.center = [0.0, 0.0, -4.0]
+        this.near = 1.0
+        this.far = -1.0
+        this.fov = 60
+        //this.right = 1
+        //this.left = -1
+        //this.top = 1
+        //this.bottom = -1
     }
 
     getProjectionMatrix() {
-        let r = this.right
-        let l = this.left
-        let t = this.top
-        let b = this.bottom
+
+        let apertura = Math.abs(this.near - this.far) * Math.tan(deg2rad(this.fov / 2.0)) // Importante: se usa mitad del ángulo!
+
+        let r = apertura
+        let l = -apertura
+        let t = apertura
+        let b = -apertura
         let n = this.near
         let f = this.far
 
