@@ -33,7 +33,7 @@ function calculateRotationMatrix(degX, degY, degZ) {
     let rotationY = deg2rad(degY)
     let rotationZ = deg2rad(degZ)
 
-    // TODO: precalcular matriz de rotación. (no multiplicar acá)
+    // TODO: Pre-compute rotation matrix
     let cosX = Math.cos(rotationX)
     let sinX = Math.sin(rotationX)
     

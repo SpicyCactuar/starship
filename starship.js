@@ -48,7 +48,7 @@ class Starship {
 	}
 
 	updateMeshData() {
-		// Vértices que definen un cubo
+		// Vertices that define faces of a cube
         var meshVertices = [
 			1.0, 1.0, 1.0,
 			-1.0, 1.0, 1.0,
@@ -99,6 +99,7 @@ class Starship {
 			1.0, 1.0, 1.0
         ];
 
+		// Colors for the vertices of the cube
 		var vertexColors = [
 			1.0, 0.0, 0.0, 1.0,
 			1.0, 0.0, 0.0, 1.0,

@@ -80,15 +80,14 @@ function drawScene() {
 function notifyViewportUpdated(width, height) {
 	// TODO: Include viewport matrix in the calculation
 	let mvp = camera.getProjectionMatrix()
-	//console.log(mvp)
     starship.onModelViewProjectionUpdated(mvp)
 }
 
 // Game loop
-setInterval( function() {
+setInterval(function() {
 	notifyViewportUpdated()
-    drawScene()
-}, 16 );
+	drawScene()
+}, 16);
 
 // Compiles vsSource and fsSource as vertex & fragment shaders respectively
 // Returns the associated program

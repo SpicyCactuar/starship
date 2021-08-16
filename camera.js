@@ -5,20 +5,16 @@ class Camera {
         this.near = 1.0
         this.far = -1.0
         this.fov = 60
-        //this.right = 1
-        //this.left = -1
-        //this.top = 1
-        //this.bottom = -1
     }
 
     getProjectionMatrix() {
 
-        let apertura = Math.abs(this.near - this.far) * Math.tan(deg2rad(this.fov / 2.0)) // Importante: se usa mitad del ángulo!
+        let amplitude = Math.abs(this.near - this.far) * Math.tan(deg2rad(this.fov / 2.0)) // Use half of the angle for each side
 
-        let r = apertura
-        let l = -apertura
-        let t = apertura
-        let b = -apertura
+        let r = amplitude
+        let l = -amplitude
+        let t = amplitude
+        let b = -amplitude
         let n = this.near
         let f = this.far
 
@@ -40,7 +36,7 @@ class Camera {
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
-            -this.center[0], -this.center[1], -this.center[2], 1,
+            -this.center[0], -this.center[1], -this.center[2], 1
         ]
         
         return matrixMultiply(perspectiveMatrix, matrixMultiply(orthographicMatrix, cameraSpaceMatrix))
