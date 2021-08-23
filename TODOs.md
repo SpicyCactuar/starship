@@ -1,0 +1,6 @@
+- Implement lighting
+- Implement object collisions
+- Wait for resource loading before starting game loop
+- Create scripts folder
+- Define GameObject structure
+- Unify code style
