@@ -11,11 +11,11 @@ var starship;
 var camera;
 
 // When window loads, perform all steps to initialize & draw the WebGL scene
-window.onload = function() {
+window.onload = async function() {
 	initializeWebGL()
     initializeScene()
     updateCanvasSize()
-	drawScene()
+	startGameLoop()
 }
 
 // Initializes canvas & webGl context
@@ -80,14 +80,15 @@ function drawScene() {
 function notifyViewportUpdated(width, height) {
 	// TODO: Include viewport matrix in the calculation
 	let mvp = camera.getProjectionMatrix()
-    starship.onModelViewProjectionUpdated(mvp)
+	starship.onModelViewProjectionUpdated(mvp)
 }
 
-// Game loop
-setInterval(function() {
-	notifyViewportUpdated()
-	drawScene()
-}, 16);
+function startGameLoop() {
+	setInterval(function() {
+		notifyViewportUpdated()
+		drawScene()
+	}, 16);
+}
 
 // Compiles vsSource and fsSource as vertex & fragment shaders respectively
 // Returns the associated program

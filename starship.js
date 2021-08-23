@@ -15,6 +15,8 @@ class Starship {
 		this.rotations = [0.0, 0.0, 0.0]
 		this.scale = [1.0, 1.0, 1.0]
 
+		this.mesh = new ObjMesh()
+
 		this.updateWorldTransform()
         
 		// Updates mesh
@@ -47,114 +49,23 @@ class Starship {
 		}, 10)
 	}
 
+	loadObj() {
+		this.mesh.load("./models/duck.obj")
+	}
+
 	updateMeshData() {
+		this.loadObj()
+
 		// Vertices that define faces of a cube
-        var meshVertices = [
-			1.0, 1.0, 1.0,
-			-1.0, 1.0, 1.0,
-			-1.0, 1.0,-1.0,
-			
-			1.0,-1.0, 1.0,
-			-1.0, 1.0, 1.0,
-			1.0, 1.0, 1.0,
-
-			-1.0, 1.0, 1.0, 
-			-1.0,-1.0, 1.0,
-            -1.0,-1.0,-1.0, 
-			
-			-1.0, 1.0,-1.0,
-			-1.0,-1.0,-1.0,
-			1.0, 1.0,-1.0, 
-			
-			1.0,-1.0,-1.0,
-			-1.0,-1.0,-1.0,
-			1.0,-1.0, 1.0,
-			
-			-1.0,-1.0,-1.0,
-			1.0,-1.0,-1.0,
-			1.0, 1.0,-1.0,
-			
-			-1.0, 1.0,-1.0,
-			-1.0, 1.0, 1.0,
-			-1.0,-1.0,-1.0,
-			
-			-1.0,-1.0,-1.0,
-			-1.0,-1.0, 1.0,
-			1.0,-1.0, 1.0,
-			
-			1.0,-1.0, 1.0,
-			-1.0,-1.0, 1.0,
-			-1.0, 1.0, 1.0,
-			
-			1.0, 1.0,-1.0,
-			1.0,-1.0,-1.0,
-			1.0, 1.0, 1.0,
-			
-			1.0,-1.0, 1.0,
-			1.0, 1.0, 1.0,
-			1.0,-1.0,-1.0,
-			
-			-1.0, 1.0,-1.0,
-			1.0, 1.0,-1.0,
-			1.0, 1.0, 1.0
-        ];
-
+        this.meshVertices = this.mesh.getVertexBuffers().positionBuffer
 		// Colors for the vertices of the cube
-		var vertexColors = [
-			1.0, 0.0, 0.0, 1.0,
-			1.0, 0.0, 0.0, 1.0,
-			1.0, 0.0, 0.0, 1.0,	
-
-			1.0, 1.0, 0.0, 1.0,
-			1.0, 1.0, 0.0, 1.0,
-			1.0, 1.0, 0.0, 1.0,
-
-			0.0, 1.0, 0.0, 1.0,
-			0.0, 1.0, 0.0, 1.0,
-			0.0, 1.0, 0.0, 1.0,
-
-			0.0, 0.0, 1.0, 1.0,
-			0.0, 0.0, 1.0, 1.0,
-			0.0, 0.0, 1.0, 1.0,
-
-			1.0, 0.0, 1.0, 1.0,
-			1.0, 0.0, 1.0, 1.0,
-			1.0, 0.0, 1.0, 1.0,
-
-			0.0, 0.0, 1.0, 1.0,
-			0.0, 0.0, 1.0, 1.0,
-			0.0, 0.0, 1.0, 1.0,
-
-			0.0, 1.0, 0.0, 1.0,
-			0.0, 1.0, 0.0, 1.0,
-			0.0, 1.0, 0.0, 1.0,
-			
-			1.0, 0.0, 1.0, 1.0,
-			1.0, 0.0, 1.0, 1.0,
-			1.0, 0.0, 1.0, 1.0,
-
-			1.0, 1.0, 0.0, 1.0,
-			1.0, 1.0, 0.0, 1.0,
-			1.0, 1.0, 0.0, 1.0,
-
-			0.0, 1.0, 1.0, 1.0,
-			0.0, 1.0, 1.0, 1.0,
-			0.0, 1.0, 1.0, 1.0,
-			
-			0.0, 1.0, 1.0, 1.0,
-			0.0, 1.0, 1.0, 1.0,
-			0.0, 1.0, 1.0, 1.0,
-
-			1.0, 0.0, 0.0, 1.0,
-			1.0, 0.0, 0.0, 1.0,
-			1.0, 0.0, 0.0, 1.0
-		]
+		//var vertexColors
         
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshVertices), gl.STATIC_DRAW);		
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.meshVertices), gl.STATIC_DRAW);		
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexColors), gl.STATIC_DRAW);
+		//gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexColors), gl.STATIC_DRAW);
 	}
 
 	setRotation(degX, degY, degZ) {
@@ -190,12 +101,12 @@ class Starship {
 	    gl.enableVertexAttribArray(this.posLoc);
 
 		// Enables vertex color attribute as a vec4
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+		/*gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
 		gl.vertexAttribPointer(this.colLoc, 4, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(this.colLoc);
+		gl.enableVertexAttribArray(this.colLoc);*/
 	
 		// Draw triangles
-		gl.drawArrays(gl.TRIANGLES, 0, 12 * 3);
+		gl.drawArrays(gl.TRIANGLES, 0, this.meshVertices.length / 3);
 	}
 
     update() {
@@ -225,6 +136,6 @@ var starshipFS = `
 	varying vec4 vcolor;
 
 	void main() {
-		gl_FragColor = vcolor;
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 	}
 `;
