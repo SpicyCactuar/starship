@@ -8,8 +8,12 @@ class Starship {
 		this.posLoc = gl.getAttribLocation(this.prog, 'pos')		
 		this.positionBuffer = gl.createBuffer()
 
-		this.colLoc = gl.getAttribLocation(this.prog, 'col')
-		this.colorBuffer = gl.createBuffer()
+		this.texLoc = gl.getAttribLocation( this.prog, 'tex' );
+		this.texCoordsBuffer = gl.createBuffer();
+
+		this.samplerLoc = gl.getUniformLocation( this.prog, 'texGPU' );
+
+		this.texture = gl.createTexture();
 
 		this.translation = [0.0, 0.0, 0.0]
 		this.rotations = [0.0, 0.0, 0.0]
@@ -51,21 +55,47 @@ class Starship {
 
 	loadObj() {
 		this.mesh.load("./models/duck.obj")
+		this.loadTexture()
 	}
 
 	updateMeshData() {
 		this.loadObj()
 
-		// Vertices that define faces of a cube
-        this.meshVertices = this.mesh.getVertexBuffers().positionBuffer
-		// Colors for the vertices of the cube
-		//var vertexColors
+		// Process mesh data and populate buffers
+		let meshData = this.mesh.getVertexBuffers()
+        this.meshVertices = meshData.positionBuffer
+		this.meshTexCoords = meshData.texCoordBuffer
+		this.meshNormals = meshData.normalBuffer
         
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.meshVertices), gl.STATIC_DRAW);		
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.meshVertices), gl.STATIC_DRAW);
+		
+		gl.bindBuffer( gl.ARRAY_BUFFER, this.texCoordsBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(this.meshTexCoords), gl.STATIC_DRAW );
+	}
 
-		//gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexColors), gl.STATIC_DRAW);
+	loadTexture() {
+		let starship = this
+		this.img = new Image()
+		this.img.onload = () => {
+			gl.useProgram( starship.prog )
+
+			gl.bindTexture( gl.TEXTURE_2D, this.texture )
+			gl.texImage2D(
+				gl.TEXTURE_2D, // Texture 2D
+				0, // Mipmap level 0
+				gl.RGB, // GPU format
+				gl.RGB, // input format
+				gl.UNSIGNED_BYTE, // type
+				starship.img // array or <img>
+			);
+			gl.generateMipmap( gl.TEXTURE_2D )
+
+			// Pass the texture to uniform
+			gl.activeTexture( gl.TEXTURE0 )
+			gl.uniform1i( starship.samplerLoc, 0 )  // Unit 0
+		}
+		this.img.src = "./textures/duck.png"
 	}
 
 	setRotation(degX, degY, degZ) {
@@ -100,10 +130,10 @@ class Starship {
 	    gl.vertexAttribPointer(this.posLoc, 3, gl.FLOAT, false, 0, 0);
 	    gl.enableVertexAttribArray(this.posLoc);
 
-		// Enables vertex color attribute as a vec4
-		/*gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-		gl.vertexAttribPointer(this.colLoc, 4, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(this.colLoc);*/
+		// Enables texture coordinates as a vec2
+		gl.bindBuffer( gl.ARRAY_BUFFER, this.texCoordsBuffer );
+		gl.vertexAttribPointer( this.texLoc, 2, gl.FLOAT, false, 0, 0 );
+		gl.enableVertexAttribArray( this.texLoc );
 	
 		// Draw triangles
 		gl.drawArrays(gl.TRIANGLES, 0, this.meshVertices.length / 3);
@@ -118,24 +148,29 @@ class Starship {
 // Vertex Shader
 var starshipVS = `
 	attribute vec3 pos;
-	attribute vec4 col;
-	varying vec4 vcolor;
+	attribute vec2 tex;
+
+	varying vec2 texCoord;
 
 	uniform mat4 mvp;
 	
 	void main() { 
-		gl_Position =  mvp * vec4(pos, 1.0);
-		vcolor = col;
+		gl_Position = mvp * vec4(pos, 1.0);
+		texCoord = tex;
 	}
 `;
 
 // Fragment Shader
 var starshipFS = `
-	precision mediump float;
+	precision mediump float;	
 	
-	varying vec4 vcolor;
+	varying vec2 texCoord;
+
+	uniform sampler2D texGPU;
 
 	void main() {
-		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		vec4 textureColor = texture2D(texGPU, texCoord);
+		gl_FragColor = textureColor;
+		//gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 	}
 `;
