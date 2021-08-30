@@ -7,7 +7,7 @@ class Camera {
         this.fov = 60
     }
 
-    getProjectionMatrix() {
+    getMVPMatrices() {
 
         let amplitude = Math.abs(this.near - this.far) * Math.tan(deg2rad(this.fov / 2.0)) // Use half of the angle for each side
 
@@ -39,7 +39,12 @@ class Camera {
             -this.center[0], -this.center[1], -this.center[2], 1
         ]
         
-        return matrixMultiply(perspectiveMatrix, matrixMultiply(orthographicMatrix, cameraSpaceMatrix))
+        let mv = matrixMultiply(orthographicMatrix, cameraSpaceMatrix)
+
+        return {
+            mv: mv,
+            mvp: matrixMultiply(perspectiveMatrix, mv)
+        }
     }
 
 

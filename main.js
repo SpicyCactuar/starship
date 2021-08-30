@@ -79,8 +79,8 @@ function drawScene() {
 
 function notifyViewportUpdated(width, height) {
 	// TODO: Include viewport matrix in the calculation
-	let mvp = camera.getProjectionMatrix()
-	starship.onModelViewProjectionUpdated(mvp)
+	let matrices = camera.getMVPMatrices()
+	starship.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)
 }
 
 function startGameLoop() {

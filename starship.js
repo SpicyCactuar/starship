@@ -3,17 +3,22 @@ class Starship {
     constructor() {
 		// Initialize necessary rendering dependencies
 		this.prog = createShaderProgram(starshipVS, starshipFS)
-		this.mvpLoc = gl.getUniformLocation(this.prog, 'mvp')
 		
+		this.mvpLoc = gl.getUniformLocation(this.prog, 'mvp')
 		this.posLoc = gl.getAttribLocation(this.prog, 'pos')		
 		this.positionBuffer = gl.createBuffer()
 
-		this.texLoc = gl.getAttribLocation( this.prog, 'tex' );
+		this.texLoc = gl.getAttribLocation(this.prog, 'tex');
 		this.texCoordsBuffer = gl.createBuffer();
-
-		this.samplerLoc = gl.getUniformLocation( this.prog, 'texGPU' );
-
+		this.samplerLoc = gl.getUniformLocation(this.prog, 'texGPU');
 		this.texture = gl.createTexture();
+		
+		this.normalLoc = gl.getAttribLocation(this.prog, 'norm');
+		this.normalsBuffer = gl.createBuffer();		
+		this.lightDirLoc = gl.getUniformLocation(this.prog, 'lightDir');
+		this.mvLoc = gl.getUniformLocation(this.prog, 'mv');
+		this.mnLoc = gl.getUniformLocation(this.prog, 'mn');
+		this.shininessLoc = gl.getUniformLocation(this.prog, 'shininess');
 
 		this.translation = [0.0, 0.0, 0.0]
 		this.rotations = [0.0, 0.0, 0.0]
@@ -22,8 +27,10 @@ class Starship {
 		this.mesh = new ObjMesh()
 
 		this.updateWorldTransform()
+
+		this.setShininess(16.0)
+		this.setLightDir(0.0, 0.0, 1.0);
         
-		// Updates mesh
         this.updateMeshData()
 		this.rotateIndefinitely()
     }
@@ -43,9 +50,8 @@ class Starship {
 		var rotationY = 0
 		var rotationX = 0
 		var rotationZ = 0
+		let starship = this
 		setInterval(function() {
-			let starship = this.starship
-			let rotations = starship.rotations
 			starship.setRotation(rotationX, rotationY, rotationZ);
 			rotationX = (rotationX + 0.5) % 360;
 			rotationY = (rotationY + 0.5) % 360;
@@ -71,7 +77,10 @@ class Starship {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.meshVertices), gl.STATIC_DRAW);
 		
 		gl.bindBuffer( gl.ARRAY_BUFFER, this.texCoordsBuffer );
-		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(this.meshTexCoords), gl.STATIC_DRAW );
+		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(this.meshTexCoords), gl.STATIC_DRAW);
+
+		gl.bindBuffer( gl.ARRAY_BUFFER, this.normalsBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(this.meshNormals), gl.STATIC_DRAW);
 	}
 
 	loadTexture() {
@@ -113,13 +122,34 @@ class Starship {
 		this.updateWorldTransform()
 	}
 
-	onModelViewProjectionUpdated(mvp) {
-		// Update model-view-projection matrix
+	setLightDir(x, y, z) {		
+		gl.useProgram( this.prog );
+
+		gl.uniform3f(this.lightDirLoc, x, y, z);
+	}
+
+	setShininess(shininess) {
+		gl.useProgram(this.prog)
+
+		shininess = Math.pow(10, shininess / 25);
+		gl.uniform1f(this.shininessLoc, shininess)
+	}
+
+	onModelViewProjectionUpdated(mvp, mv) {
+		// Update model-view-projection matrix		
 		mvp = matrixMultiply(mvp, this.worldTransform)
+		mv = matrixMultiply(mv, this.worldTransform)
+		let mn = [ 
+			mv[0], mv[1], mv[2],
+			mv[4], mv[5], mv[6],
+			mv[8], mv[9], mv[10]
+		]
 		
 		// Set mvp matrix value in shaders
 		gl.useProgram(this.prog);
 		gl.uniformMatrix4fv(this.mvpLoc, false, mvp);
+		gl.uniformMatrix4fv(this.mvLoc, false, mv);
+		gl.uniformMatrix3fv(this.mnLoc, false, mn);
 	}
 	
 	draw() {
@@ -134,14 +164,15 @@ class Starship {
 		gl.bindBuffer( gl.ARRAY_BUFFER, this.texCoordsBuffer );
 		gl.vertexAttribPointer( this.texLoc, 2, gl.FLOAT, false, 0, 0 );
 		gl.enableVertexAttribArray( this.texLoc );
+
+		// Enables normals coordinates as vec3
+		gl.bindBuffer( gl.ARRAY_BUFFER, this.normalsBuffer );
+		gl.vertexAttribPointer( this.normalLoc, 3, gl.FLOAT, false, 0, 0 );
+		gl.enableVertexAttribArray( this.normalLoc );
 	
 		// Draw triangles
 		gl.drawArrays(gl.TRIANGLES, 0, this.meshVertices.length / 3);
 	}
-
-    update() {
-        // TODO: Implement
-    }
 
 }
 
@@ -149,28 +180,54 @@ class Starship {
 var starshipVS = `
 	attribute vec3 pos;
 	attribute vec2 tex;
-
-	varying vec2 texCoord;
-
+	attribute vec3 norm;
+	
 	uniform mat4 mvp;
+
+	varying vec4 vertCoord;
+	varying vec2 texCoord;
+	varying vec3 normCoord;
 	
 	void main() { 
 		gl_Position = mvp * vec4(pos, 1.0);
+		vertCoord = vec4(pos, 1.0);
 		texCoord = tex;
+		normCoord = norm;
 	}
 `;
 
 // Fragment Shader
 var starshipFS = `
-	precision mediump float;	
-	
-	varying vec2 texCoord;
+	precision mediump float;
 
 	uniform sampler2D texGPU;
 
+	uniform vec3 lightDir;
+	uniform float shininess;
+	uniform mat3 mn;
+	uniform mat4 mv;
+
+	varying vec4 vertCoord;
+	varying vec2 texCoord;
+	varying vec3 normCoord;
+
 	void main() {
+		vec3 normal = normalize(mn * normCoord);
+
+		float cosTheta = max(0.0, dot(normal, lightDir));
+
+		vec3 r = normalize(2.0 * dot(lightDir, normal) * normal - lightDir);
+		vec3 v = normalize((mv * vertCoord).xyz);
+		float cosSigma = max(0.0, dot(v, r));
+		
+		vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
+
+		vec4 I = white;
+
 		vec4 textureColor = texture2D(texGPU, texCoord);
-		gl_FragColor = textureColor;
-		//gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		vec4 Kd = textureColor;
+		vec4 Ks = white;
+		
+		gl_FragColor = I * (cosTheta * Kd + (Ks * pow(cosSigma, shininess)));
 	}
 `;
