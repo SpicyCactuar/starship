@@ -8,17 +8,17 @@ class Starship {
 		this.posLoc = gl.getAttribLocation(this.prog, 'pos')		
 		this.positionBuffer = gl.createBuffer()
 
-		this.texLoc = gl.getAttribLocation(this.prog, 'tex');
-		this.texCoordsBuffer = gl.createBuffer();
-		this.samplerLoc = gl.getUniformLocation(this.prog, 'texGPU');
-		this.texture = gl.createTexture();
+		this.texLoc = gl.getAttribLocation(this.prog, 'tex')
+		this.texCoordsBuffer = gl.createBuffer()
+		this.samplerLoc = gl.getUniformLocation(this.prog, 'texGPU')
+		this.texture = gl.createTexture()
 		
-		this.normalLoc = gl.getAttribLocation(this.prog, 'norm');
-		this.normalsBuffer = gl.createBuffer();		
-		this.lightDirLoc = gl.getUniformLocation(this.prog, 'lightDir');
-		this.mvLoc = gl.getUniformLocation(this.prog, 'mv');
-		this.mnLoc = gl.getUniformLocation(this.prog, 'mn');
-		this.shininessLoc = gl.getUniformLocation(this.prog, 'shininess');
+		this.normalLoc = gl.getAttribLocation(this.prog, 'norm')
+		this.normalsBuffer = gl.createBuffer()
+		this.lightDirLoc = gl.getUniformLocation(this.prog, 'lightDir')
+		this.mvLoc = gl.getUniformLocation(this.prog, 'mv')
+		this.mnLoc = gl.getUniformLocation(this.prog, 'mn')
+		this.shininessLoc = gl.getUniformLocation(this.prog, 'shininess')
 
 		this.translation = [0.0, 0.0, 0.0]
 		this.rotations = [0.0, 0.0, 0.0]
@@ -26,13 +26,21 @@ class Starship {
 
 		this.mesh = new ObjMesh()
 
-		this.updateWorldTransform()
+		this.leftKey = false
+		this.rightKey = false
+		this.upKey = false
+		this.downKey = false
+		this.barrelRollKey = false
 
 		this.setShininess(16.0)
-		this.setLightDir(0.0, 0.0, 1.0);
+		this.setLightDir(0.0, 0.0, 1.0)
         
         this.updateMeshData()
-		this.rotateIndefinitely()
+		this.setRotation(-40.0, 180.0, 0.0)
+
+		this.updateWorldTransform()
+
+		this.initializeEventListeners()
     }
 
 	updateWorldTransform() {
@@ -46,21 +54,34 @@ class Starship {
 		]
 	}
 
-	rotateIndefinitely() {
-		var rotationY = 0
-		var rotationX = 0
-		var rotationZ = 0
+	initializeEventListeners() {
 		let starship = this
-		setInterval(function() {
-			starship.setRotation(rotationX, rotationY, rotationZ);
-			rotationX = (rotationX + 0.5) % 360;
-			rotationY = (rotationY + 0.5) % 360;
-			rotationZ = (rotationZ + 0.1) % 360;
-		}, 10)
+		document.addEventListener('keydown', function(event) {
+			if (event.key == "ArrowLeft") {
+				starship.leftKey = true
+			} else if (event.key == "ArrowRight") {
+				starship.rightKey = true
+			} else if (event.key == "ArrowUp") {
+				starship.upKey = true
+			} else if (event.key == "ArrowDown") {
+				starship.downKey = true
+			}
+		});
+		document.addEventListener('keyup', function(event) {
+			if (event.key == "ArrowLeft") {
+				starship.leftKey = false
+			} else if (event.key == "ArrowRight") {
+				starship.rightKey = false
+			} else if (event.key == "ArrowUp") {
+				starship.upKey = false
+			} else if (event.key == "ArrowDown") {
+				starship.downKey = false
+			}
+		});
 	}
 
 	loadObj() {
-		this.mesh.load("./models/duck.obj")
+		this.mesh.load("./models/starship.obj")
 		this.loadTexture()
 	}
 
@@ -76,18 +97,18 @@ class Starship {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.meshVertices), gl.STATIC_DRAW);
 		
-		gl.bindBuffer( gl.ARRAY_BUFFER, this.texCoordsBuffer );
-		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(this.meshTexCoords), gl.STATIC_DRAW);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordsBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.meshTexCoords), gl.STATIC_DRAW);
 
-		gl.bindBuffer( gl.ARRAY_BUFFER, this.normalsBuffer );
-		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(this.meshNormals), gl.STATIC_DRAW);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.normalsBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.meshNormals), gl.STATIC_DRAW);
 	}
 
 	loadTexture() {
 		let starship = this
 		this.img = new Image()
 		this.img.onload = () => {
-			gl.useProgram( starship.prog )
+			gl.useProgram(starship.prog)
 
 			gl.bindTexture( gl.TEXTURE_2D, this.texture )
 			gl.texImage2D(
@@ -123,22 +144,22 @@ class Starship {
 	}
 
 	setLightDir(x, y, z) {		
-		gl.useProgram( this.prog );
+		gl.useProgram(this.prog)
 
-		gl.uniform3f(this.lightDirLoc, x, y, z);
+		gl.uniform3f(this.lightDirLoc, x, y, z)
 	}
 
 	setShininess(shininess) {
 		gl.useProgram(this.prog)
 
-		shininess = Math.pow(10, shininess / 25);
+		shininess = Math.pow(10, shininess / 25)
 		gl.uniform1f(this.shininessLoc, shininess)
 	}
 
 	onModelViewProjectionUpdated(mvp, mv) {
 		// Update model-view-projection matrix		
-		mvp = matrixMultiply(mvp, this.worldTransform)
-		mv = matrixMultiply(mv, this.worldTransform)
+		mvp = matrixMultiply(this.worldTransform, mvp)
+		mv = matrixMultiply(this.worldTransform, mv)
 		let mn = [ 
 			mv[0], mv[1], mv[2],
 			mv[4], mv[5], mv[6],
@@ -172,6 +193,19 @@ class Starship {
 	
 		// Draw triangles
 		gl.drawArrays(gl.TRIANGLES, 0, this.meshVertices.length / 3);
+	}
+
+	update() {
+		var translationX = this.translation[0]
+		var translationY = this.translation[1]
+
+		translationX += (this.rightKey ? 0.01 : 0.0)
+		translationX -= (this.leftKey ? 0.01 : 0.0)
+
+		translationY += (this.upKey ? 0.01 : 0.0)
+		translationY -= (this.downKey ? 0.01 : 0.0)
+		
+		this.setTranslation(translationX, translationY, this.translation[2])
 	}
 
 }

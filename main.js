@@ -70,6 +70,11 @@ function updateCanvasSize() {
     notifyViewportUpdated(width, height)
 }
 
+function updateScene() {
+	
+	starship.update()
+}
+
 function drawScene() {
 	// Clear WebGL buffers
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -85,6 +90,7 @@ function notifyViewportUpdated(width, height) {
 
 function startGameLoop() {
 	setInterval(function() {
+		updateScene()
 		notifyViewportUpdated()
 		drawScene()
 	}, 16);

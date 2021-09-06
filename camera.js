@@ -1,10 +1,10 @@
 class Camera {
 
     constructor() {
-        this.center = [0.0, 0.0, -4.0]
+        this.center = [0.0, 0.0, -5.0]
         this.near = 1.0
         this.far = -1.0
-        this.fov = 60
+        this.fov = 60.0
     }
 
     getMVPMatrices() {
