@@ -43,12 +43,15 @@ function initializeWebGL() {
 function initializeScene() {
 	camera = new Camera()
 
-	gameObjectList.push(createStarship())
-	let stage = createStage()
+	let starship = createStarship()
+	starship.setTranslation(0.0, 0.0, -10.0)
+	starship.setRotation(0.0, 180.0, 0.0)
+	gameObjectList.push(starship)
+	/*let stage = createStage()
 	stage.setScale(0.1, 0.1, 0.1)
 	stage.setRotation(45.0, 0.0, 0.0)
 	stage.setTranslation(0.0, 0.0, 0.0)
-	gameObjectList.push(stage)
+	gameObjectList.push(stage)*/
 }
 
 function createStage() {
@@ -65,7 +68,7 @@ function createStage() {
 	}
 	stageImage.src = "./textures/rock.png"
 
-	return new GameObject(stageDrawer)
+	return new GameObject(stageDrawer, "stage")
 }
 
 function createStarship() {
@@ -130,8 +133,8 @@ function drawScene() {
 
 function notifyViewportUpdated(width, height) {
 	// TODO: Include viewport matrix in the calculation
-	let matrices = camera.getMVPMatrices()	
-	
+	let matrices = camera.getMVPMatrices()
+
 	drawerList.forEach(function(drawer) {
 		drawer.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)
 	})

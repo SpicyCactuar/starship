@@ -1,15 +1,28 @@
 class Camera {
 
     constructor() {
-        this.center = [0.0, 0.0, -5.0]
+        this.center = [0.0, 0.0, 0.0]
         this.near = 1.0
-        this.far = -1.0
-        this.fov = 60.0
+        this.far = 50.0
+        this.fov = deg2rad(60.0)
     }
 
-    getMVPMatrices() {
+    calculatePerspectiveMatrix() {
+        let aspectRatio = window.innerWidth / window.innerHeight
 
-        let amplitude = Math.abs(this.near - this.far) * Math.tan(deg2rad(this.fov / 2.0)) // Use half of the angle for each side
+        var f = 1.0 / Math.tan(this.fov / 2)
+        var rangeInv = 1 / (this.near - this.far)
+      
+        return [
+          f / aspectRatio, 0,                          0,   0,
+          0,               f,                          0,   0,
+          0,               0,    (this.near + this.far) * rangeInv,  -1,
+          0,               0,  this.near * this.far * rangeInv * 2,   0
+        ];
+      }
+
+    getMVPMatrices() {
+        let amplitude = Math.abs(this.near - this.far) * Math.tan(this.fov / 2.0) // Use half of the angle for each side
 
         let r = amplitude
         let l = -amplitude
@@ -18,32 +31,25 @@ class Camera {
         let n = this.near
         let f = this.far
 
-        let orthographicMatrix = [
+        let Morth = [
             2 / (r - l), 0, 0, 0,
             0, 2 / (t - b), 0, 0,
             0, 0, 2 / (n - f), 0,
             -(r + l) / (r - l), -(t + b) / (t - b), -(n + f) / (n - f), 1
         ]
 
-        let perspectiveMatrix = [
-            n, 0, 0, 0,
-            0, n, 0, 0,
-            0, 0, n + f, 1,
-            0, 0, - f * n, 0
-        ]
-
-        let cameraSpaceMatrix = [
+        let Mper = this.calculatePerspectiveMatrix()
+        
+        let Mcam = [
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             -this.center[0], -this.center[1], -this.center[2], 1
         ]
-        
-        let mv = matrixMultiply(orthographicMatrix, cameraSpaceMatrix)
 
         return {
-            mv: mv,
-            mvp: matrixMultiply(perspectiveMatrix, mv)
+            mv: matrixMultiply(Morth, Mcam),
+            mvp: matrixMultiply(Mper, Mcam)
         }
     }
 

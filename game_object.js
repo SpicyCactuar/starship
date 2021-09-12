@@ -1,11 +1,12 @@
 class GameObject {
 
-    constructor(objectDrawer) {
+    constructor(objectDrawer, name) {
         this.translation = [0.0, 0.0, 0.0]
 		this.rotations = [0.0, 0.0, 0.0]
 		this.scale = [1.0, 1.0, 1.0]
 
         this.drawer = objectDrawer
+		this.name = name
 
         this.updateWorldTransform()
     }
