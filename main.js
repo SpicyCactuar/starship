@@ -58,7 +58,7 @@ function createStage() {
 	let stageDrawer = new ObjectDrawer()
 	drawerList.push(stageDrawer)
 
-	let mesh = new ObjMesh()
+	let mesh = new ObjectMesh()
 	mesh.load("./models/final_destination.obj")
 	stageDrawer.setMesh(mesh)
 
@@ -75,7 +75,7 @@ function createStarship() {
 	let starshipDrawer = new ObjectDrawer()
 	drawerList.push(starshipDrawer)
 
-	let mesh = new ObjMesh()
+	let mesh = new ObjectMesh()
 	mesh.load("./models/starship.obj")
 	starshipDrawer.setMesh(mesh)
 
