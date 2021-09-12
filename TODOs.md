@@ -4,7 +4,6 @@
 - Check redundant notifyViewportUpdated in game loop
 - Add world grid
 - Wait for resource loading before starting game loop & show loading feedback
-- Create scripts folder
 - Unify code style
 - Correct Window Aspect Ratio
 
