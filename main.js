@@ -113,7 +113,7 @@ function updateCanvasSize() {
 	gl.viewport(0, 0, canvas.width, canvas.height)
 
 	// Upon resizing canvas, notify scene objects
-    notifyViewportUpdated(width, height)
+    notifyViewportUpdated()
 }
 
 function updateScene() {
@@ -131,7 +131,7 @@ function drawScene() {
 	})
 }
 
-function notifyViewportUpdated(width, height) {
+function notifyViewportUpdated() {
 	// TODO: Include viewport matrix in the calculation
 	let matrices = camera.getMVPMatrices()
 
@@ -143,7 +143,6 @@ function notifyViewportUpdated(width, height) {
 function startGameLoop() {
 	setInterval(function() {
 		updateScene()
-		notifyViewportUpdated()
 		drawScene()
 	}, 16);
 }

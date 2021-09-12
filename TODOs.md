@@ -1,7 +1,6 @@
 # TODO
 
 - Implement object collisions
-- Check redundant notifyViewportUpdated in game loop
 - Add world grid
 - Wait for resource loading before starting game loop & show loading feedback
 - Unify code style
