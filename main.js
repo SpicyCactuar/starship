@@ -9,7 +9,7 @@ var gameObjectList = [];
 var drawerList = [];
 
 // Camera
-var camera;
+var camera = new Camera();
 
 // When window loads, perform all steps to initialize & draw the WebGL scene
 window.onload = async function() {
@@ -41,21 +41,25 @@ function initializeWebGL() {
 
 // Initializes scene objects
 function initializeScene() {
-	camera = new Camera()
+	let cameraMatrices = camera.getMVPMatrices()	
 
-	let starship = createStarship()
-	starship.setTranslation(0.0, 0.0, -10.0)
-	starship.setRotation(0.0, 180.0, 0.0)
+	let stage = createStage(cameraMatrices)
+	gameObjectList.push(stage)
+	
+	let starship = createStarship(cameraMatrices)
 	gameObjectList.push(starship)
-	/*let stage = createStage()
-	stage.setScale(0.1, 0.1, 0.1)
+		
+	stage.setScale(1.0, 1.0, 1.0)
 	stage.setRotation(45.0, 0.0, 0.0)
-	stage.setTranslation(0.0, 0.0, 0.0)
-	gameObjectList.push(stage)*/
+	stage.setTranslation(0.0, 0.0, -8.0)
+	
+	starship.setTranslation(0.0, 0.0, -5.0)
+	starship.setRotation(0.0, 180.0, 0.0)
+	
 }
 
-function createStage() {
-	let stageDrawer = new ObjectDrawer()
+function createStage(cameraMatrices) {
+	let stageDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
 	drawerList.push(stageDrawer)
 
 	let mesh = new ObjectMesh()
@@ -68,11 +72,12 @@ function createStage() {
 	}
 	stageImage.src = "./textures/rock.png"
 
-	return new GameObject(stageDrawer, "stage")
+	return new Stage(stageDrawer)
 }
 
-function createStarship() {
-	let starshipDrawer = new ObjectDrawer()
+function createStarship(cameraMatrices) {
+	let matrices = camera.getMVPMatrices()
+	let starshipDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
 	drawerList.push(starshipDrawer)
 
 	let mesh = new ObjectMesh()

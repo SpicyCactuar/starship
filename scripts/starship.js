@@ -2,8 +2,8 @@ const MOVEMENT_DELTA = 0.05
 
 class Starship extends GameObject {
 
-    constructor(sharshipDrawer) {
-        super(sharshipDrawer, "starship")
+    constructor(starshipDrawer) {
+        super(starshipDrawer, "starship")
         
         this.initializeEventListeners()
     }

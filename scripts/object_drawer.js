@@ -1,6 +1,6 @@
 class ObjectDrawer {
 
-    constructor() {
+    constructor(mvp, mv) {
         this.prog = createShaderProgram(starshipVS, starshipFS)
 
         this.mvpLoc = gl.getUniformLocation(this.prog, 'mvp')
@@ -19,21 +19,11 @@ class ObjectDrawer {
 		this.mnLoc = gl.getUniformLocation(this.prog, 'mn')
 		this.shininessLoc = gl.getUniformLocation(this.prog, 'shininess')
 
-		this.setShininess(16.0)
-		this.setLightDir(0.0, 0.0, 1.0)
+		this.setShininess(64.0)
+		this.setLightDir(0.0, 0.0, -1.0)
 
-		this.mvp = [
-			1.0, 0.0, 0.0, 0.0,
-			0.0, 1.0, 0.0, 0.0,
-			0.0, 0.0, 1.0, 0.0,
-			0.0, 0.0, 0.0, 1.0,
-		]
-		this.mv = [
-			1.0, 0.0, 0.0, 0.0,
-			0.0, 1.0, 0.0, 0.0,
-			0.0, 0.0, 1.0, 0.0,
-			0.0, 0.0, 0.0, 1.0,
-		]
+		this.mvp = mvp
+		this.mv = mv
     }
 
     setTexture(loadedImage) {
@@ -49,13 +39,11 @@ class ObjectDrawer {
             loadedImage // array or <img>
         );
         gl.generateMipmap(gl.TEXTURE_2D)
-
-        // Pass the texture to uniform
-        gl.activeTexture(gl.TEXTURE0)
-        gl.uniform1i(this.samplerLoc, 0)  // Unit 0
     }
 
     setMesh(loadedMesh) {
+		gl.useProgram(this.prog)
+
         // Process mesh data and populate buffers
 		let meshData = loadedMesh.getVertexBuffers()
         this.meshVertices = meshData.positionBuffer
@@ -124,6 +112,11 @@ class ObjectDrawer {
 		gl.bindBuffer( gl.ARRAY_BUFFER, this.normalsBuffer );
 		gl.vertexAttribPointer( this.normalLoc, 3, gl.FLOAT, false, 0, 0 );
 		gl.enableVertexAttribArray( this.normalLoc );
+
+		// Pass the texture to uniform
+		gl.bindTexture(gl.TEXTURE_2D, this.texture)
+        gl.activeTexture(gl.TEXTURE0)
+        gl.uniform1i(this.samplerLoc, 0)  // Unit 0
 	
 		// Draw triangles
 		gl.drawArrays(gl.TRIANGLES, 0, this.meshVertices.length / 3);
@@ -172,7 +165,7 @@ var starshipFS = `
 		float cosTheta = max(0.0, dot(normal, lightDir));
 
 		vec3 r = normalize(2.0 * dot(lightDir, normal) * normal - lightDir);
-		vec3 v = normalize((mv * vertCoord).xyz);
+		vec3 v = normalize(-(mv * vertCoord).xyz);
 		float cosSigma = max(0.0, dot(v, r));
 		
 		vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
