@@ -17,7 +17,41 @@ window.onload = async function() {
     initializeScene()
     updateCanvasSize()
 	startGameLoop()
+	InitializeGameInputListeners()
 }
+
+function InitializeGameInputListeners(){
+	document.addEventListener('keydown', function(event) {
+		var current_angleX = camera.rotation[0]
+		var current_angleY = camera.rotation[1]
+		var current_position = camera.center
+		
+		var rotated = false
+
+		if (event.key == "a") {
+			current_angleY -= 1.0
+			rotated = true
+		} else if (event.key == "d") {
+			current_angleY += 1.0
+			rotated = true
+		} else if (event.key == "w") {
+			current_angleX -= 1.0
+			rotated = true
+		} else if (event.key == "s") {
+			current_angleX += 1.0
+			rotated = true
+		}
+
+		if (rotated){
+			current_position[0] = Math.sin(deg2rad(current_angleY)) * 1.0 
+			current_position[2] = Math.cos(deg2rad(current_angleY)) * 1.0 + 5.0
+			camera.center = current_position
+			camera.setRotation(current_angleX, current_angleY, camera.rotation[2])
+			notifyViewportUpdated()
+		}
+	});
+}
+
 
 // Initializes canvas & webGl context
 function initializeWebGL() {
@@ -51,9 +85,9 @@ function initializeScene() {
 		
 	stage.setScale(1.0, 1.0, 1.0)
 	stage.setRotation(45.0, 0.0, 0.0)
-	stage.setTranslation(0.0, 0.0, -8.0)
+	stage.setTranslation(0.0, -1.0, -10.0)
 	
-	starship.setTranslation(0.0, 0.0, -5.0)
+	starship.setTranslation(0.0, 0.0, -3.0)
 	starship.setRotation(0.0, 180.0, 0.0)
 	
 }
@@ -76,7 +110,6 @@ function createStage(cameraMatrices) {
 }
 
 function createStarship(cameraMatrices) {
-	let matrices = camera.getMVPMatrices()
 	let starshipDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
 	drawerList.push(starshipDrawer)
 
@@ -142,6 +175,9 @@ function notifyViewportUpdated() {
 
 	drawerList.forEach(function(drawer) {
 		drawer.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)
+	})
+	gameObjectList.forEach(function(gameObject) {
+		gameObject.updateWorldTransform()
 	})
 }
 
