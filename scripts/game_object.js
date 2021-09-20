@@ -8,6 +8,7 @@ class GameObject {
         this.drawer = objectDrawer
 		this.name = name
 
+		this.collider = new Collider([0.0, 0.25, 0.0], 1.0, 1.0, 2.0)		
         this.updateWorldTransform()
     }
 
@@ -20,12 +21,14 @@ class GameObject {
 			rotMatrix[8] * this.scale[2], rotMatrix[9] * this.scale[2], rotMatrix[10] * this.scale[2], 0.0,
 			this.translation[0], this.translation[1], this.translation[2], 1.0
 		]
-
+		
+		this.collider.updateWorldTransform(worldTransform)
         this.drawer.updateWorldTransform(worldTransform)
 	}
 
     draw() {
         this.drawer.draw()
+		this.collider.draw()
     }
 
     update() {}

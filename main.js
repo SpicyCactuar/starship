@@ -7,6 +7,7 @@ var gl;
 // GameObjects
 var gameObjectList = [];
 var drawerList = [];
+var colliderList = [];
 
 // Camera
 var camera = new Camera();
@@ -17,10 +18,10 @@ window.onload = async function() {
     initializeScene()
     updateCanvasSize()
 	startGameLoop()
-	InitializeGameInputListeners()
+	initializeGameInputListeners()
 }
 
-function InitializeGameInputListeners(){
+function initializeGameInputListeners(){
 	document.addEventListener('keydown', function(event) {
 		var current_angleX = camera.rotation[0]
 		var current_angleY = camera.rotation[1]
@@ -82,6 +83,7 @@ function initializeScene() {
 	
 	let starship = createStarship(cameraMatrices)
 	gameObjectList.push(starship)
+	colliderList.push(starship.collider)
 		
 	stage.setScale(1.0, 1.0, 1.0)
 	stage.setRotation(45.0, 0.0, 0.0)
@@ -89,7 +91,6 @@ function initializeScene() {
 	
 	starship.setTranslation(0.0, 0.0, -3.0)
 	starship.setRotation(0.0, 180.0, 0.0)
-	
 }
 
 function createStage(cameraMatrices) {
@@ -175,10 +176,14 @@ function notifyViewportUpdated() {
 
 	drawerList.forEach(function(drawer) {
 		drawer.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)
+	})	
+	colliderList.forEach(function(collider) {
+		collider.onModelViewProjectionUpdated(matrices.mvp)
 	})
 	gameObjectList.forEach(function(gameObject) {
 		gameObject.updateWorldTransform()
 	})
+	
 }
 
 function startGameLoop() {
