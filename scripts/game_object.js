@@ -8,8 +8,9 @@ class GameObject {
         this.drawer = objectDrawer
 		this.name = name
 
-		this.collider = new Collider([0.0, 0.25, 0.0], 1.0, 1.0, 2.0)		
+		this.collider = new Collider([0.0, 0.25, 0.0], 1.0, 1.0, 2.0)
         this.updateWorldTransform()
+		engine.onObjectCreated(this)
     }
 
     updateWorldTransform() {
@@ -46,6 +47,14 @@ class GameObject {
 	setScale(scaleX, scaleY, scaleZ) {
 		this.scale = [scaleX, scaleY, scaleZ]
 		this.updateWorldTransform()
+	}
+
+	onCollided(otherGameObject) {
+		console.log(this.name + " collided with: " + otherGameObject.name)
+	}
+
+	destroy() {
+		engine.onObjectDestroyed(this)
 	}
 
 }

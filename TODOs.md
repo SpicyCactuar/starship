@@ -1,10 +1,14 @@
 # TODO
 
+- Design gameplay loop
 - Add camera controls
-- Implement object collisions
 - Add world grid
 - Wait for resource loading before starting game loop & show loading feedback
 - Unify code style
 - Correct Window Aspect Ratio (Fixed?)
+- Input Management
+- Implement DEBUG mode
 
 # Issues / Bugs
+
+- Manage drawer creation/deletion better

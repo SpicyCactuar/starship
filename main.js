@@ -1,27 +1,25 @@
 // Canvas to draw on
-var canvas;
+var canvas
 
 // WebGL context
-var gl;
-
-// GameObjects
-var gameObjectList = [];
-var drawerList = [];
-var colliderList = [];
+var gl
 
 // Camera
-var camera = new Camera();
+var camera = new Camera()
+
+// Engine
+var engine = new Engine()
 
 // When window loads, perform all steps to initialize & draw the WebGL scene
 window.onload = async function() {
 	initializeWebGL()
-    initializeScene()
+    engine.initializeScene()
     updateCanvasSize()
-	startGameLoop()
+	engine.startGameLoop()
 	initializeGameInputListeners()
 }
 
-function initializeGameInputListeners(){
+function initializeGameInputListeners() {
 	document.addEventListener('keydown', function(event) {
 		var currentAngleX = camera.rotation[0]
 		var currentAngleY = camera.rotation[1]
@@ -48,9 +46,9 @@ function initializeGameInputListeners(){
 			currentPosition[2] = Math.cos(deg2rad(currentAngleY)) * 1.0 + 5.0
 			camera.center = currentPosition
 			camera.setRotation(currentAngleX, currentAngleY, camera.rotation[2])
-			notifyViewportUpdated()
+			engine.notifyViewportUpdated(camera)
 		}
-	});
+	})
 }
 
 
@@ -74,63 +72,9 @@ function initializeWebGL() {
 	gl.cullFace(gl.BACK)
 }
 
-// Initializes scene objects
-function initializeScene() {
-	let cameraMatrices = camera.getMVPMatrices()	
-
-	let stage = createStage(cameraMatrices)
-	gameObjectList.push(stage)
-	
-	let starship = createStarship(cameraMatrices)
-	gameObjectList.push(starship)
-	colliderList.push(starship.collider)
-		
-	stage.setScale(1.0, 1.0, 1.0)
-	stage.setRotation(45.0, 0.0, 0.0)
-	stage.setTranslation(0.0, -1.0, -10.0)
-	
-	starship.setTranslation(0.0, 0.0, -3.0)
-	starship.setRotation(0.0, 180.0, 0.0)
-}
-
-function createStage(cameraMatrices) {
-	let stageDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
-	drawerList.push(stageDrawer)
-
-	let mesh = new ObjectMesh()
-	mesh.load("./models/final_destination.obj")
-	stageDrawer.setMesh(mesh)
-
-	let stageImage = new Image()
-	stageImage.onload = function() {
-		stageDrawer.setTexture(stageImage)
-	}
-	stageImage.src = "./textures/rock.png"
-
-	return new Stage(stageDrawer)
-}
-
-function createStarship(cameraMatrices) {
-	let starshipDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
-	drawerList.push(starshipDrawer)
-
-	let mesh = new ObjectMesh()
-	mesh.load("./models/duck.obj")
-	starshipDrawer.setMesh(mesh)
-
-	let starshipImage = new Image()
-	starshipImage.onload = function() {
-		starshipDrawer.setTexture(starshipImage)
-	}
-	starshipImage.src = "./textures/duck.png"
-
-	return new Starship(starshipDrawer)
-}
-
 // Updates canvas size & redraws scene
 function windowResize() {
 	updateCanvasSize()
-	drawScene()
 }
 
 function updateCanvasSize() {
@@ -152,43 +96,5 @@ function updateCanvasSize() {
 	gl.viewport(0, 0, canvas.width, canvas.height)
 
 	// Upon resizing canvas, notify scene objects
-    notifyViewportUpdated()
-}
-
-function updateScene() {
-	gameObjectList.forEach(function(gameObject) {
-		gameObject.update()
-	})
-}
-
-function drawScene() {
-	// Clear WebGL buffers
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    gameObjectList.forEach(function(gameObject) {
-		gameObject.draw()
-	})
-}
-
-function notifyViewportUpdated() {
-	// TODO: Include viewport matrix in the calculation
-	let matrices = camera.getMVPMatrices()
-
-	drawerList.forEach(function(drawer) {
-		drawer.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)
-	})	
-	colliderList.forEach(function(collider) {
-		collider.onModelViewProjectionUpdated(matrices.mvp)
-	})
-	gameObjectList.forEach(function(gameObject) {
-		gameObject.updateWorldTransform()
-	})
-	
-}
-
-function startGameLoop() {
-	setInterval(function() {
-		updateScene()
-		drawScene()
-	}, 16);
+    engine.notifyViewportUpdated(camera)
 }

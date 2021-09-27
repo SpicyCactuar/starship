@@ -20,7 +20,7 @@ class Starship extends GameObject {
 			} else if (event.key == "ArrowDown") {
 				starship.downKey = true
 			}
-		});
+		})
 		document.addEventListener('keyup', function(event) {
 			if (event.key == "ArrowLeft") {
 				starship.leftKey = false
@@ -31,7 +31,7 @@ class Starship extends GameObject {
 			} else if (event.key == "ArrowDown") {
 				starship.downKey = false
 			}
-		});
+		})
 	}
 
     update() {
