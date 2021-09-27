@@ -19,7 +19,7 @@ class ObjectDrawer {
 		this.mnLoc = gl.getUniformLocation(this.prog, 'mn')
 		this.shininessLoc = gl.getUniformLocation(this.prog, 'shininess')
 
-		this.setShininess(64.0)
+		this.setShininess(32.0)
 		this.setLightDir(0.0, 0.0, -1.0)
 
 		this.mvp = mvp

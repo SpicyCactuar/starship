@@ -8,5 +8,3 @@
 - Correct Window Aspect Ratio (Fixed?)
 
 # Issues / Bugs
-
-- Check Model View Matrix (mv) in specular calculation (v vector with -mv)

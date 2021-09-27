@@ -23,31 +23,31 @@ window.onload = async function() {
 
 function initializeGameInputListeners(){
 	document.addEventListener('keydown', function(event) {
-		var current_angleX = camera.rotation[0]
-		var current_angleY = camera.rotation[1]
-		var current_position = camera.center
+		var currentAngleX = camera.rotation[0]
+		var currentAngleY = camera.rotation[1]
+		var currentPosition = camera.center
 		
 		var rotated = false
 
 		if (event.key == "a") {
-			current_angleY -= 1.0
+			currentAngleY -= 1.0
 			rotated = true
 		} else if (event.key == "d") {
-			current_angleY += 1.0
+			currentAngleY += 1.0
 			rotated = true
 		} else if (event.key == "w") {
-			current_angleX -= 1.0
+			currentAngleX -= 1.0
 			rotated = true
 		} else if (event.key == "s") {
-			current_angleX += 1.0
+			currentAngleX += 1.0
 			rotated = true
 		}
 
-		if (rotated){
-			current_position[0] = Math.sin(deg2rad(current_angleY)) * 1.0 
-			current_position[2] = Math.cos(deg2rad(current_angleY)) * 1.0 + 5.0
-			camera.center = current_position
-			camera.setRotation(current_angleX, current_angleY, camera.rotation[2])
+		if (rotated) {
+			currentPosition[0] = Math.sin(deg2rad(currentAngleY)) * 1.0 
+			currentPosition[2] = Math.cos(deg2rad(currentAngleY)) * 1.0 + 5.0
+			camera.center = currentPosition
+			camera.setRotation(currentAngleX, currentAngleY, camera.rotation[2])
 			notifyViewportUpdated()
 		}
 	});
@@ -115,7 +115,7 @@ function createStarship(cameraMatrices) {
 	drawerList.push(starshipDrawer)
 
 	let mesh = new ObjectMesh()
-	mesh.load("./models/starship.obj")
+	mesh.load("./models/duck.obj")
 	starshipDrawer.setMesh(mesh)
 
 	let starshipImage = new Image()
