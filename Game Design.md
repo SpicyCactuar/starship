@@ -22,12 +22,12 @@
 
 ## Extra
 
-- Sound effects and maybe music (nice to have)
-- UI -> Score / Time or something like that
+- Player wins if starship travels certain distance (or time?)
 - Restart Game
-- Player wins if starship travels certain distance
-- Different Backrounds
+- UI -> Score / Time or something like that
+- Sound effects and maybe music
 - Procedural Floor/Stage/etc.
+- Different Backrounds
 
 # Resources
 

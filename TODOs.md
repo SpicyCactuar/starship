@@ -12,3 +12,4 @@
 # Issues / Bugs
 
 - Manage drawer creation/deletion better
+- Reuse asteroid texture

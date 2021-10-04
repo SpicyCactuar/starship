@@ -26,9 +26,9 @@ class Camera {
 		this.rotation = [degX, degY, degZ]
 	}
 
-    setDepth(depth) {
-        this.center = [this.center[0], this.center[1], depth]
-        engine.notifyViewportUpdated(this)
+    moveZ(z) {
+        this.center = [this.center[0], this.center[1], z]
+        engine.notifyViewportUpdated()
     }
 
     getMVPMatrices() {

@@ -15,7 +15,6 @@ window.onload = async function() {
 	engine.startGameLoop()
 }
 
-
 // Initializes canvas & webGl context
 function initializeWebGL() {
 	canvas = document.getElementById("canvas")

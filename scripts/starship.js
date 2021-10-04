@@ -53,7 +53,7 @@ class Starship extends GameObject {
 		translationZ -= (this.propelling ? SPEED : 0.0)
 		
 		this.setTranslation(translationX, translationY, translationZ)
-		this.attachedCamera?.setDepth(translationZ + CAMERA_DISTANCE)
+		this.attachedCamera?.moveZ(translationZ + CAMERA_DISTANCE)
 	}
 
 	propel() {
