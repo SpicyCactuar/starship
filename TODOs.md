@@ -1,6 +1,6 @@
 # TODO
 
-- Design gameplay loop
+- Implement gameplay
 - Add camera controls
 - Add world grid
 - Wait for resource loading before starting game loop & show loading feedback

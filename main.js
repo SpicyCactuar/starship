@@ -4,9 +4,6 @@ var canvas
 // WebGL context
 var gl
 
-// Camera
-var camera = new Camera()
-
 // Engine
 var engine = new Engine()
 
@@ -16,39 +13,6 @@ window.onload = async function() {
     engine.initializeScene()
     updateCanvasSize()
 	engine.startGameLoop()
-	initializeGameInputListeners()
-}
-
-function initializeGameInputListeners() {
-	document.addEventListener('keydown', function(event) {
-		var currentAngleX = camera.rotation[0]
-		var currentAngleY = camera.rotation[1]
-		var currentPosition = camera.center
-		
-		var rotated = false
-
-		if (event.key == "a") {
-			currentAngleY -= 1.0
-			rotated = true
-		} else if (event.key == "d") {
-			currentAngleY += 1.0
-			rotated = true
-		} else if (event.key == "w") {
-			currentAngleX -= 1.0
-			rotated = true
-		} else if (event.key == "s") {
-			currentAngleX += 1.0
-			rotated = true
-		}
-
-		if (rotated) {
-			currentPosition[0] = Math.sin(deg2rad(currentAngleY)) * 1.0 
-			currentPosition[2] = Math.cos(deg2rad(currentAngleY)) * 1.0 + 5.0
-			camera.center = currentPosition
-			camera.setRotation(currentAngleX, currentAngleY, camera.rotation[2])
-			engine.notifyViewportUpdated(camera)
-		}
-	})
 }
 
 
@@ -96,5 +60,5 @@ function updateCanvasSize() {
 	gl.viewport(0, 0, canvas.width, canvas.height)
 
 	// Upon resizing canvas, notify scene objects
-    engine.notifyViewportUpdated(camera)
+    engine.notifyViewportUpdated()
 }

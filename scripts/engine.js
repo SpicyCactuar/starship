@@ -3,66 +3,40 @@ class Engine {
     constructor() {
         this.gameObjectList = []
         this.drawerList = []
+        this.camera = new Camera()
     }
 
     onObjectCreated(gameObject) {
         this.gameObjectList.push(gameObject)
+        this.drawerList.push(gameObject.drawer)
     }
 
     onObjectDestroyed(gameObject) {
-        const index = this.gameObjectList.indexOf(gameObject)
-        if (index > -1) {
-            this.gameObjectList.splice(index, 1)
+        const gameObjectIndex = this.gameObjectList.indexOf(gameObject)
+        if (gameObjectIndex > -1) {
+            this.gameObjectList.splice(gameObjectIndex, 1)
+        }
+
+        const drawerIndex = this.drawerList.indexOf(gameObject.drawer)
+        if (drawerIndex > -1) {
+            this.drawerList.splice(drawerIndex, 1)
         }
     }
 
-    // Initializes scene objects
     initializeScene() {
-        let cameraMatrices = camera.getMVPMatrices()	
-
-        let stage = this.createStage(cameraMatrices)
-        let starship = this.createStarship(cameraMatrices)
-            
-        stage.setScale(1.0, 1.0, 1.0)
-        stage.setRotation(45.0, 0.0, 0.0)
-        stage.setTranslation(0.0, 0.0, -10.0)
+        let cameraMatrices = this.camera.getMVPMatrices()
         
-        starship.setTranslation(0.0, 0.0, -3.0)
+        let starship = Starship.create(cameraMatrices)
+        starship.setTranslation(0.0, 0.0, -5.0)
         starship.setRotation(0.0, 180.0, 0.0)
-    }
 
-    createStage(cameraMatrices) {
-        let stageDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
-        this.drawerList.push(stageDrawer)
+        let asteroid1 = Asteroid.create(cameraMatrices)
+        asteroid1.setTranslation(0.0, 0.0, -22.0)
+        asteroid1.setScale(0.15, 0.15, 0.15)
 
-        let mesh = new ObjectMesh()
-        mesh.load("./models/final_destination.obj")
-        stageDrawer.setMesh(mesh)
-
-        let stageImage = new Image()
-        stageImage.onload = function() {
-            stageDrawer.setTexture(stageImage)
-        }
-        stageImage.src = "./textures/rock.png"
-
-        return new Stage(stageDrawer)
-    }
-
-    createStarship(cameraMatrices) {
-        let starshipDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
-        this.drawerList.push(starshipDrawer)
-
-        let mesh = new ObjectMesh()
-        mesh.load("./models/duck.obj")
-        starshipDrawer.setMesh(mesh)
-
-        let starshipImage = new Image()
-        starshipImage.onload = function() {
-            starshipDrawer.setTexture(starshipImage)
-        }
-        starshipImage.src = "./textures/duck.png"
-
-        return new Starship(starshipDrawer)
+        let asteroid2 = Asteroid.create(cameraMatrices)
+        asteroid2.setTranslation(0.0, 5.0, -32.0)
+        asteroid2.setScale(0.15, 0.15, 0.15)
     }
 
     startGameLoop() {
@@ -71,6 +45,18 @@ class Engine {
             engine.updateScene()
             engine.drawScene()
         }, 16);
+
+        setTimeout(function() {
+            engine.propelStarship()
+        }, 1500)
+    }
+
+    propelStarship() {
+        let starship = this.gameObjectList
+            .find(gameObject => gameObject.name == "starship")
+
+        starship.attachCamera(this.camera)
+        starship.propel()
     }
 
     updateScene() {
@@ -100,8 +86,8 @@ class Engine {
         })
     }
 
-    notifyViewportUpdated(camera) {
-        let matrices = camera.getMVPMatrices()
+    notifyViewportUpdated() {
+        let matrices = this.camera.getMVPMatrices()
 
         this.drawerList.forEach(function(drawer) {
             drawer.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)

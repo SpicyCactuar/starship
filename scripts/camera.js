@@ -1,7 +1,7 @@
 class Camera {
 
     constructor() {
-        this.center = [0.0, 0.0, 0.0]
+        this.center = [0.0, 1.0, 0.0]
         this.rotation = [0.0, 0.0, 0.0]
         this.near = 1.0
         this.far = 50.0
@@ -15,16 +15,21 @@ class Camera {
         var rangeInv = 1 / (this.near - this.far)
       
         return [
-          f / aspectRatio, 0,                          0,   0,
-          0,               f,                          0,   0,
-          0,               0,    (this.near + this.far) * rangeInv,  -1,
-          0,               0,  this.near * this.far * rangeInv * 2,   0
+            f / aspectRatio, 0,                          0,   0,
+            0,               f,                          0,   0,
+            0,               0,    (this.near + this.far) * rangeInv,  -1,
+            0,               0,  this.near * this.far * rangeInv * 2,   0
         ];
     }
 
     setRotation(degX, degY, degZ) {
 		this.rotation = [degX, degY, degZ]
 	}
+
+    setDepth(depth) {
+        this.center = [this.center[0], this.center[1], depth]
+        engine.notifyViewportUpdated(this)
+    }
 
     getMVPMatrices() {
         let amplitude = Math.abs(this.near - this.far) * Math.tan(this.fov / 2.0) // Use half of the angle for each side
@@ -59,6 +64,5 @@ class Camera {
             mvp: matrixMultiply(Mper, Mcam)
         }
     }
-
 
 }
