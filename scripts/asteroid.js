@@ -12,7 +12,25 @@ class Asteroid extends GameObject {
 		let rotationZ = (this.rotations[2] + ROTATION_DEGREES_DELTA) % 360
 		
 		this.setRotation(this.rotations[0], rotationY, rotationZ)
+        this.destroyIfOutOfBounds()
 	}
+
+    destroyIfOutOfBounds() {
+        let cameraZ = engine.camera.center[2]
+        
+        // Add delta to avoid destroying in front of players faces
+        if (cameraZ < this.translation[2] + 1.0) {
+            this.destroy()
+        }
+    }
+
+    onCollided(otherGameObject) {
+        super.onCollided(otherGameObject)
+
+        if (otherGameObject.name == "laser") {
+            this.destroy()
+        }
+    }
 
     static asteroidMesh = null
 

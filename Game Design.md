@@ -5,7 +5,7 @@
 - Game Loop
     - Move Spaceship and camera forward
     - Spawn Asteroids in the distance every 1 - 3 secs (random)
-    - If player collides with asteroids, die (explosion?) -> Fail State
+    - If player collides with asteroids, die (explosion?) -> Fail State 
 - Starship
     - Moves vertically and horizontally (small smooth rotations)
     - Constant speed forward
@@ -15,9 +15,10 @@
     - Rotate permanently
     - Random model + size (0.9 - 1.1 scale)
 - Particles
-    - Explosion
+    - Stars
     - Propulsion
-    - Stars / Debris
+    - Explosion
+    - Debris
 - Background
 
 ## Extra

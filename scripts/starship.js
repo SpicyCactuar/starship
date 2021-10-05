@@ -1,6 +1,7 @@
 const CARTESIAN_MOVEMENT_DELTA = 0.05
-const SPEED = 0.15
+const STARSHIP_SPEED = 0.15
 const CAMERA_DISTANCE = 5.0
+const LASER_FORWARD_SPAWN_DELTA = 3.0
 
 class Starship extends GameObject {
 
@@ -34,6 +35,8 @@ class Starship extends GameObject {
 				starship.upKey = false
 			} else if (event.key == "ArrowDown") {
 				starship.downKey = false
+			} else if (event.key == " ") {
+				starship.shoot()
 			}
 		})
 	}
@@ -50,10 +53,15 @@ class Starship extends GameObject {
 		translationY -= (this.downKey ? CARTESIAN_MOVEMENT_DELTA : 0.0)
 
 		// Negative Z axis is farther
-		translationZ -= (this.propelling ? SPEED : 0.0)
+		translationZ -= (this.propelling ? STARSHIP_SPEED : 0.0)
 		
 		this.setTranslation(translationX, translationY, translationZ)
 		this.attachedCamera?.moveZ(translationZ + CAMERA_DISTANCE)
+	}
+
+	shoot() {
+		let laser = Laser.create(engine.camera.getMVPMatrices())
+		laser.setTranslation(this.translation[0], this.translation[1], this.translation[2] - LASER_FORWARD_SPAWN_DELTA)
 	}
 
 	propel() {
@@ -75,7 +83,9 @@ class Starship extends GameObject {
 	onCollided(otherGameObject) {
 		super.onCollided(otherGameObject)
 
-		this.destroy()
+		if (otherGameObject.name == "asteroid") {
+			this.destroy()
+		}
 	}
 
 	static create(cameraMatrices) {
