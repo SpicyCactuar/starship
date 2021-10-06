@@ -18,9 +18,12 @@ class ObjectDrawer {
 		this.mvLoc = gl.getUniformLocation(this.prog, 'mv')
 		this.mnLoc = gl.getUniformLocation(this.prog, 'mn')
 		this.shininessLoc = gl.getUniformLocation(this.prog, 'shininess')
+		this.lightToggleLoc = gl.getUniformLocation(this.prog, 'use_light')
 
 		this.setShininess(32.0)
 		this.setLightDir(0.0, 0.0, -1.0)
+
+		this.toggleLighting(true)
 
 		this.mvp = mvp
 		this.mv = mv
@@ -71,6 +74,13 @@ class ObjectDrawer {
 
 		shininess = Math.pow(10, shininess / 25)
 		gl.uniform1f(this.shininessLoc, shininess)
+	}
+
+	toggleLighting(use_lights) {
+		gl.useProgram(this.prog)
+
+		let lighting = use_lights ? 1.0 : 0.0
+		gl.uniform1f(this.lightToggleLoc, lighting)
 	}
 
 	onModelViewProjectionUpdated(mvp, mv) {
@@ -152,6 +162,7 @@ var starshipFS = `
 
 	uniform vec3 lightDir;
 	uniform float shininess;
+	uniform float use_light;
 	uniform mat3 mn;
 	uniform mat4 mv;
 
@@ -162,7 +173,7 @@ var starshipFS = `
 	void main() {
 		vec3 normal = normalize(mn * normCoord);
 
-		float cosTheta = max(0.0, dot(normal, lightDir));
+		float cosTheta = mix(max(0.0, dot(normal, lightDir)), 1.0, 1.0-use_light);
 
 		vec3 r = normalize(2.0 * dot(lightDir, normal) * normal - lightDir);
 		vec3 v = normalize(-(mv * vertCoord).xyz);
@@ -174,7 +185,7 @@ var starshipFS = `
 
 		vec4 textureColor = texture2D(texGPU, texCoord);
 		vec4 Kd = textureColor;
-		vec4 Ks = white;
+		vec4 Ks = white * use_light;
 		
 		gl_FragColor = I * (cosTheta * Kd + (Ks * pow(cosSigma, shininess)));
 	}
