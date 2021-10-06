@@ -4,6 +4,9 @@ const CAMERA_DISTANCE = 5.0
 const LASER_FORWARD_SPAWN_DELTA = 2.5
 const MAX_ROT = 40.0
 
+const LIMIT_X = 4.5
+const LIMIT_Y = 3.0
+
 class Starship extends GameObject {
 
     constructor(starshipDrawer) {
@@ -57,6 +60,9 @@ class Starship extends GameObject {
 
 		translationX += spdX
 		translationY += spdY
+
+		translationX = Math.min(Math.max(translationX, -LIMIT_X), LIMIT_X)
+		translationY = Math.min(Math.max(translationY, -LIMIT_Y+1.5), LIMIT_Y)
 
 		// Negative Z axis is farther
 		translationZ -= (this.propelling ? STARSHIP_SPEED : 0.0)
