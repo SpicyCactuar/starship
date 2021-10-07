@@ -14,12 +14,15 @@ class Starship extends GameObject {
 		this.propelling = false
 		this.attachedCamera = null
 		
-		this.collider = new Collider([0.0, 0.35, 0.0], 1.0, 0.5, 2.0)
+		this.collider = new Collider([0.0, 0.0, 0.0], 1.0, 0.5, 2.0)
         
         this.addMovementEventListeners()
 
 		this.starting_rotations = [0.0, 180.0, 0.0]
 		this.setRotation(this.starting_rotations[0], this.starting_rotations[1], this.starting_rotations[2])
+
+		this.making_a_barrel_roll = 0
+		this.lastSideKey = this.rightKey
     }
 
     addMovementEventListeners() {
@@ -27,14 +30,18 @@ class Starship extends GameObject {
 		document.addEventListener('keydown', function(event) {
 			if (event.key == "ArrowLeft") {
 				starship.leftKey = true
+				starship.lastSideKey = event.key
 			} else if (event.key == "ArrowRight") {
 				starship.rightKey = true
+				starship.lastSideKey = event.key
 			} else if (event.key == "ArrowUp") {
 				starship.upKey = true
 			} else if (event.key == "ArrowDown") {
 				starship.downKey = true
 			} else if (event.key == " ") {
 				starship.shoot()
+			} else if (event.key == "z"){
+				starship.barrelRoll()
 			}
 		})
 		document.addEventListener('keyup', function(event) {
@@ -84,7 +91,6 @@ class Starship extends GameObject {
 		let rotX = this.rotations[0] - this.starting_rotations[0]
 		let rotY = this.rotations[1] - this.starting_rotations[1]
 		//let rotZ = this.rotations[2]
-		console.log(rotX, rotY)
 
 		laser.setRotation(laser.rotations[0] - rotX, laser.rotations[1] + rotY, laser.rotations[2])
 		laser.setTranslation(
@@ -107,22 +113,47 @@ class Starship extends GameObject {
 		this.propelling = false
 	}
 
+	barrelRoll(){
+		if (this.making_a_barrel_roll == 0){
+			this.making_a_barrel_roll = (this.lastSideKey == "ArrowLeft" ? 1.0 : -1.0)
+		}
+	}
+
 	rotateSmoothlyBy(speedX, speedY){
 		let rotX = this.rotations[0]
 		let rotY = this.rotations[1]
 		let rotZ = this.rotations[2]
-
-		rotX -= speedY * MAX_ROT
-		if (Math.abs(rotX - this.starting_rotations[0]) > MAX_ROT){
-			rotX = this.starting_rotations[0] - Math.sign(speedY) * MAX_ROT
-		}
-		rotY -= speedX * MAX_ROT
-		if (Math.abs(rotY - this.starting_rotations[1]) > MAX_ROT){
-			rotY = this.starting_rotations[1] - Math.sign(speedX) * MAX_ROT
-		}		
-
+		
 		rotX -= (rotX - this.starting_rotations[0]) * CARTESIAN_MOVEMENT_DELTA;
 		rotY -= (rotY - this.starting_rotations[1]) * CARTESIAN_MOVEMENT_DELTA;
+		if (this.making_a_barrel_roll != 0){
+			rotX = this.starting_rotations[0]
+			rotY = this.starting_rotations[1]
+			rotZ += 18.0 * this.making_a_barrel_roll
+			if (Math.abs(rotZ) >= 360){
+				rotZ = 0;
+				this.making_a_barrel_roll = 0
+			}
+		} else {
+			rotX -= speedY * MAX_ROT
+			if (Math.abs(rotX - this.starting_rotations[0]) > MAX_ROT){
+				rotX = this.starting_rotations[0] - Math.sign(speedY) * MAX_ROT
+			}
+			
+			rotY -= speedX * MAX_ROT
+			if (Math.abs(rotY - this.starting_rotations[1]) > MAX_ROT){
+				rotY = this.starting_rotations[1] - Math.sign(speedX) * MAX_ROT
+			}
+			
+			/*
+			rotZ -= speedX * MAX_ROT
+			if (Math.abs(rotZ - this.starting_rotations[2]) > (MAX_ROT)){
+				rotZ = this.starting_rotations[1] - Math.sign(speedX) * MAX_ROT
+			}
+			*/			
+			
+			rotZ -= (rotZ - this.starting_rotations[2]) * CARTESIAN_MOVEMENT_DELTA;
+		}
 
 		this.setRotation(rotX, rotY, rotZ)
 	}
@@ -147,7 +178,7 @@ class Starship extends GameObject {
         let starshipDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
 
         let mesh = new ObjectMesh()
-        mesh.load("./models/starship.obj")
+        mesh.load("./models/starship2.obj")
         starshipDrawer.setMesh(mesh)
 
         let starshipImage = new Image()
