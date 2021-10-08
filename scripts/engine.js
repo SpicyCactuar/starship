@@ -28,7 +28,6 @@ class Engine {
         
         let starship = Starship.create(cameraMatrices)
         starship.setTranslation(0.0, 0.0, -5.0)
-        //starship.setRotation(0.0, 180.0, 0.0)
 
         let asteroid1 = Asteroid.create(cameraMatrices)
         asteroid1.setTranslation(0.0, 0.0, -22.0)

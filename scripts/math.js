@@ -63,3 +63,13 @@ function calculateRotationMatrix(degX, degY, degZ) {
     ];
     return matrixMultiply(matZ, matrixMultiply(matY, matX));
 }
+
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max)
+}
+
+function epsilonSubstract(a, b, epsilon) {
+    let result = a - b
+
+    return Math.abs(result) < epsilon ? 0.0 : result
+}
