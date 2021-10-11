@@ -27,6 +27,11 @@ class GameObject {
         this.drawer.updateWorldTransform(worldTransform)
 	}
 
+	onModelViewProjectionUpdated(mvp, mv) {
+		this.collider.onModelViewProjectionUpdated(mvp)
+		this.drawer.onModelViewProjectionUpdated(mvp, mv)
+	}
+
     draw() {
         this.drawer.draw()
 		this.collider.draw()

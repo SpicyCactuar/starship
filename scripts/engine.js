@@ -2,24 +2,17 @@ class Engine {
 
     constructor() {
         this.gameObjectList = []
-        this.drawerList = []
         this.camera = new Camera()
     }
 
     onObjectCreated(gameObject) {
         this.gameObjectList.push(gameObject)
-        this.drawerList.push(gameObject.drawer)
     }
 
     onObjectDestroyed(gameObject) {
         const gameObjectIndex = this.gameObjectList.indexOf(gameObject)
         if (gameObjectIndex > -1) {
             this.gameObjectList.splice(gameObjectIndex, 1)
-        }
-
-        const drawerIndex = this.drawerList.indexOf(gameObject.drawer)
-        if (drawerIndex > -1) {
-            this.drawerList.splice(drawerIndex, 1)
         }
     }
 
@@ -96,13 +89,9 @@ class Engine {
     notifyViewportUpdated() {
         let matrices = this.camera.getMVPMatrices()
 
-        this.drawerList.forEach(function(drawer) {
-            drawer.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)
-        })
-
         this.gameObjectList.forEach(function(gameObject) {
             // Do not re-order these calls
-            gameObject.collider.onModelViewProjectionUpdated(matrices.mvp)
+            gameObject.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)
             // TODO: This is hacky, we should recalculate inside onModelViewProjectionUpdated
             gameObject.updateWorldTransform()
         })
