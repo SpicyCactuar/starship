@@ -1,3 +1,6 @@
+const LIMIT_X = 4.5
+const LIMIT_Y = 3.0
+
 class Camera {
 
     constructor() {

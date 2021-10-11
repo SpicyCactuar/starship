@@ -36,6 +36,9 @@ class Engine {
         let asteroid2 = Asteroid.create(cameraMatrices)
         asteroid2.setTranslation(0.0, 5.0, -32.0)
         asteroid2.setScale(0.15, 0.15, 0.15)
+
+        this.stars = Stars.create(this.camera, cameraMatrices)
+        this.stars.setAmount(90)
     }
 
     startGameLoop() {
@@ -45,6 +48,7 @@ class Engine {
             engine.drawScene()
         }, 16);
 
+        // TODO: Move logic to new Scene object
         setTimeout(function() {
             engine.propelStarship()
         }, 1500)
@@ -74,6 +78,8 @@ class Engine {
                 }
             })
         })
+
+        this.stars.update()
     }
     
     drawScene() {
@@ -83,6 +89,8 @@ class Engine {
         this.gameObjectList.forEach(function(gameObject) {
             gameObject.draw()
         })
+
+        this.stars.draw()
     }
 
     notifyViewportUpdated() {
@@ -95,8 +103,11 @@ class Engine {
         this.gameObjectList.forEach(function(gameObject) {
             // Do not re-order these calls
             gameObject.collider.onModelViewProjectionUpdated(matrices.mvp)
+            // TODO: This is hacky, we should recalculate inside onModelViewProjectionUpdated
             gameObject.updateWorldTransform()
         })
+
+        this.stars.onModelViewProjectionUpdated(matrices.mvp)
     }
 
 }

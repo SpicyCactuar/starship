@@ -6,9 +6,6 @@ const MAX_CARTESIAN_ROTATION = 40.0
 const ROLL_ROTATION_SPEED = 18.0
 const SHOOT_COOLDOWN = 0.1
 
-const LIMIT_X = 4.5
-const LIMIT_Y = 3.0
-
 class Starship extends GameObject {
 
     constructor(starshipDrawer) {
@@ -167,8 +164,6 @@ class Starship extends GameObject {
 
 		let rotX = epsilonSubstract(this.rotations[0], this.initialRotations[0], 0.01)
 		let rotY = epsilonSubstract(this.rotations[1], this.initialRotations[1], 0.01)
-
-		console.log(rotX, " ", rotY)
 
 		let laserDirection = [
 			-Math.sin(deg2rad(rotY)),
