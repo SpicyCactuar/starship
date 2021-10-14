@@ -18,9 +18,9 @@ class Starship extends GameObject {
         this.addMovementEventListeners()
 
 		// TODO: Remove when using definitive model
-		this.initialRotations = [0.0, 180.0, 0.0]
-		this.setRotation(this.initialRotations[0], this.initialRotations[1], this.initialRotations[2])
-		this.setScale(0.5, 0.5, 0.5)
+		this.initialRotations = [0.0, 0.0, 0.0]
+		//this.setRotation(this.initialRotations[0], this.initialRotations[1], this.initialRotations[2])
+		//this.setScale(0.5, 0.5, 0.5)
 
 		this.shootCooldown = 0
 		// (-1) is left, (+1) is right, 0 is no roll
@@ -118,11 +118,11 @@ class Starship extends GameObject {
 
 	calculateCartesianRotations(speedX, speedY) {
 		let rotX = speedY != 0 ? 
-			this.rotations[0] - speedY * MAX_CARTESIAN_ROTATION :
+			this.rotations[0] + speedY * MAX_CARTESIAN_ROTATION :
 			epsilonSubstract(this.rotations[0], (this.rotations[0] - this.initialRotations[0]) * CARTESIAN_MOVEMENT_DELTA, 0.05)
 
 		if (Math.abs(rotX - this.initialRotations[0]) > MAX_CARTESIAN_ROTATION) {
-			rotX = this.initialRotations[0] - Math.sign(speedY) * MAX_CARTESIAN_ROTATION
+			rotX = this.initialRotations[0] + Math.sign(speedY) * MAX_CARTESIAN_ROTATION
 		}
 
 		let rotY = speedX != 0 ?
@@ -168,13 +168,13 @@ class Starship extends GameObject {
 
 		let laserDirection = [
 			-Math.sin(deg2rad(rotY)),
-			-Math.sin(deg2rad(rotX)),
+			Math.sin(deg2rad(rotX)),
 			-1
 		]
 		
 		let laser = Laser.create(engine.camera.getMVPMatrices(), laserDirection)
 
-		laser.setRotation(laser.rotations[0] - rotX, laser.rotations[1] + rotY, laser.rotations[2])
+		laser.setRotation(laser.rotations[0] + rotX, laser.rotations[1] + rotY, laser.rotations[2])
 		laser.setTranslation(
 			this.translation[0] + laserDirection[0] * LASER_FORWARD_SPAWN_DELTA,
 			this.translation[1] + laserDirection[1] * LASER_FORWARD_SPAWN_DELTA + 0.35,
