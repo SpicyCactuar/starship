@@ -20,6 +20,7 @@ class Starship extends GameObject {
 		// TODO: Remove when using definitive model
 		this.initialRotations = [0.0, 180.0, 0.0]
 		this.setRotation(this.initialRotations[0], this.initialRotations[1], this.initialRotations[2])
+		this.setScale(0.5, 0.5, 0.5)
 
 		this.shootCooldown = 0
 		// (-1) is left, (+1) is right, 0 is no roll
@@ -201,14 +202,14 @@ class Starship extends GameObject {
         let starshipDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
 
         let mesh = new ObjectMesh()
-        mesh.load("./models/starship.obj")
+        mesh.load("./models/PawShip.obj")
         starshipDrawer.setMesh(mesh)
 
         let starshipImage = new Image()
         starshipImage.onload = function() {
             starshipDrawer.setTexture(starshipImage)
         }
-        starshipImage.src = "./textures/duck.png"
+        starshipImage.src = "./textures/BaseColor.jpg"
 
         return new Starship(starshipDrawer)
     }

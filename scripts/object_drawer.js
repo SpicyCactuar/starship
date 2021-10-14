@@ -183,7 +183,7 @@ var starshipFS = `
 
 		vec4 I = white;
 
-		vec4 textureColor = texture2D(texGPU, texCoord);
+		vec4 textureColor = texture2D(texGPU, vec2(texCoord.x, 1.0 - texCoord.y));
 		vec4 Kd = textureColor;
 		vec4 Ks = white * use_light;
 		
