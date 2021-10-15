@@ -18,7 +18,7 @@ class ObjectDrawer {
 		this.mvLoc = gl.getUniformLocation(this.prog, 'mv')
 		this.mnLoc = gl.getUniformLocation(this.prog, 'mn')
 		this.shininessLoc = gl.getUniformLocation(this.prog, 'shininess')
-		this.lightToggleLoc = gl.getUniformLocation(this.prog, 'use_light')
+		this.lightToggleLoc = gl.getUniformLocation(this.prog, 'useLight')
 
 		this.setShininess(32.0)
 		this.setLightDir(0.0, 0.0, -1.0)
@@ -76,29 +76,37 @@ class ObjectDrawer {
 		gl.uniform1f(this.shininessLoc, shininess)
 	}
 
-	toggleLighting(use_lights) {
+	toggleLighting(useLights) {
 		gl.useProgram(this.prog)
 
-		let lighting = use_lights ? 1.0 : 0.0
+		let lighting = useLights ? 1.0 : 0.0
 		gl.uniform1f(this.lightToggleLoc, lighting)
 	}
 
 	onModelViewProjectionUpdated(mvp, mv) {
 		this.mvp = mvp
 		this.mv = mv
+
+		this.updateShaderMatrices()
 	}
 
     updateWorldTransform(worldTransform) {
-		// Update model-view-projection matrix		
-		let transformedMvp = matrixMultiply(this.mvp, worldTransform)
-		let transformedMv = matrixMultiply(this.mv, worldTransform)
+		this.worldTransform = worldTransform
+
+		this.updateShaderMatrices()
+	}
+
+	updateShaderMatrices() {
+		if (this.mvp == null || this.mv == null || this.worldTransform == null) return
+
+		let transformedMvp = matrixMultiply(this.mvp, this.worldTransform)
+		let transformedMv = matrixMultiply(this.mv, this.worldTransform)
 		let mn = [ 
 			transformedMv[0], transformedMv[1], transformedMv[2],
 			transformedMv[4], transformedMv[5], transformedMv[6],
 			transformedMv[8], transformedMv[9], transformedMv[10]
 		]
 		
-		// Set mvp matrix value in shaders
 		gl.useProgram(this.prog);
 		gl.uniformMatrix4fv(this.mvpLoc, false, transformedMvp);
 		gl.uniformMatrix4fv(this.mvLoc, false, transformedMv);
@@ -162,7 +170,7 @@ var starshipFS = `
 
 	uniform vec3 lightDir;
 	uniform float shininess;
-	uniform float use_light;
+	uniform float useLight;
 	uniform mat3 mn;
 	uniform mat4 mv;
 
@@ -173,7 +181,7 @@ var starshipFS = `
 	void main() {
 		vec3 normal = normalize(mn * normCoord);
 
-		float cosTheta = mix(max(0.0, dot(normal, lightDir)), 1.0, 1.0-use_light);
+		float cosTheta = mix(max(0.0, dot(normal, lightDir)), 1.0, 1.0 - useLight);
 
 		vec3 r = normalize(2.0 * dot(lightDir, normal) * normal - lightDir);
 		vec3 v = normalize(-(mv * vertCoord).xyz);
@@ -185,7 +193,7 @@ var starshipFS = `
 
 		vec4 textureColor = texture2D(texGPU, vec2(texCoord.x, 1.0 - texCoord.y));
 		vec4 Kd = textureColor;
-		vec4 Ks = white * use_light;
+		vec4 Ks = white * useLight;
 		
 		gl_FragColor = I * (cosTheta * Kd + (Ks * pow(cosSigma, shininess)));
 	}

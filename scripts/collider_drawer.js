@@ -9,6 +9,7 @@ class ColliderDrawer {
 		this.positionBuffer = gl.createBuffer()
 
         this.mvp = null
+        this.worldTransform = null
         
         this.setColor([1.0, 1.0, 0.0, 1.0])
     }
@@ -29,17 +30,25 @@ class ColliderDrawer {
 
 	onModelViewProjectionUpdated(mvp) {
 		this.mvp = mvp
+
+        this.updateShaderMvp()
 	}
 
     updateWorldTransform(worldTransform) {	
-        if (this.mvp == null) return
-        
-        let newMVP = matrixMultiply(this.mvp, worldTransform)
+        this.worldTransform = worldTransform
+
+        this.updateShaderMvp()
+	}
+
+    updateShaderMvp() {
+        if (this.mvp == null || this.worldTransform == null) return
+
+        let newMVP = matrixMultiply(this.mvp, this.worldTransform)
 
 		// Set mvp matrix value in shaders
 		gl.useProgram(this.prog);
 		gl.uniformMatrix4fv(this.mvpLoc, false, newMVP);
-	}
+    }
 	
 	draw() {
 		gl.useProgram(this.prog);

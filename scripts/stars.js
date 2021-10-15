@@ -4,6 +4,8 @@ class Stars {
         this.particles = []
         this.camera = camera
         this.mvp = mvp
+
+        engine.onObjectCreated(this)
     }
 
     setAmount(amount) {

@@ -35,6 +35,7 @@ class Camera {
     }
 
     getMVPMatrices() {
+        // TODO: Optimize by calculating only after conditions have changed, return cached instance otherwise
         let amplitude = Math.abs(this.near - this.far) * Math.tan(this.fov / 2.0) // Use half of the angle for each side
 
         let r = amplitude

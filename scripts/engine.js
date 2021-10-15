@@ -1,37 +1,34 @@
 class Engine {
 
     constructor() {
-        this.gameObjectList = []
+        this.drawables = []
+        this.collidables = []
         this.camera = new Camera()
     }
 
     onObjectCreated(gameObject) {
-        this.gameObjectList.push(gameObject)
+        if (gameObject.collider) {
+            this.collidables.push(gameObject)
+        }
+        this.drawables.push(gameObject)
     }
 
     onObjectDestroyed(gameObject) {
-        const gameObjectIndex = this.gameObjectList.indexOf(gameObject)
-        if (gameObjectIndex > -1) {
-            this.gameObjectList.splice(gameObjectIndex, 1)
+        if (gameObject.collider) {
+            this.removeElement(gameObject, this.collidables)
+        }
+        this.removeElement(gameObject, this.drawables)
+    }
+
+    removeElement(element, list) {
+        const elementIndex = list.indexOf(element)
+        if (elementIndex > -1) {
+            list.splice(elementIndex, 1)
         }
     }
 
     initializeScene() {
-        let cameraMatrices = this.camera.getMVPMatrices()
-        
-        let starship = Starship.create(cameraMatrices)
-        starship.setTranslation(0.0, 0.0, -5.0)
-
-        let asteroid1 = Asteroid.create(cameraMatrices)
-        asteroid1.setTranslation(0.0, 0.0, -22.0)
-        asteroid1.setScale(0.15, 0.15, 0.15)
-
-        let asteroid2 = Asteroid.create(cameraMatrices)
-        asteroid2.setTranslation(0.0, 5.0, -32.0)
-        asteroid2.setScale(0.15, 0.15, 0.15)
-
-        this.stars = Stars.create(this.camera, cameraMatrices)
-        this.stars.setAmount(90)
+        this.scene = Scene.create(this.camera)
     }
 
     startGameLoop() {
@@ -41,62 +38,44 @@ class Engine {
             engine.drawScene()
         }, 16);
 
-        // TODO: Move logic to new Scene object
         setTimeout(function() {
-            engine.propelStarship()
+            engine.scene.start()
         }, 1500)
-    }
-
-    propelStarship() {
-        let starship = this.gameObjectList
-            .find(gameObject => gameObject.name == "starship")
-
-        starship.attachCamera(this.camera)
-        starship.propel()
     }
 
     updateScene() {
         let engine = this
 
-        engine.gameObjectList.forEach(function(gameObject) {
-            gameObject.update()
+        engine.drawables.forEach(function(drawable) {
+            drawable.update()
         })
     
-        engine.gameObjectList.forEach(function(gameObject) {
-            engine.gameObjectList.forEach(function(otherGameObject) {
-                if (gameObject === otherGameObject) return
+        engine.collidables.forEach(function(collidable) {
+            engine.collidables.forEach(function(otherCollidable) {
+                if (collidable === otherCollidable) return
                 
-                if (gameObject.collider.isColliding(otherGameObject.collider)) {
-                    gameObject.onCollided(otherGameObject)
+                if (collidable.collider.isColliding(otherCollidable.collider)) {
+                    collidable.onCollided(otherCollidable)
                 }
             })
         })
-
-        this.stars.update()
     }
     
     drawScene() {
         // Clear WebGL buffers
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-        this.gameObjectList.forEach(function(gameObject) {
-            gameObject.draw()
+        this.drawables.forEach(function(drawable) {
+            drawable.draw()
         })
-
-        this.stars.draw()
     }
 
     notifyViewportUpdated() {
         let matrices = this.camera.getMVPMatrices()
 
-        this.gameObjectList.forEach(function(gameObject) {
-            // Do not re-order these calls
-            gameObject.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)
-            // TODO: This is hacky, we should recalculate inside onModelViewProjectionUpdated
-            gameObject.updateWorldTransform()
+        this.drawables.forEach(function(drawable) {
+            drawable.onModelViewProjectionUpdated(matrices.mvp, matrices.mv)
         })
-
-        this.stars.onModelViewProjectionUpdated(matrices.mvp)
     }
 
 }

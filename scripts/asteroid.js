@@ -1,4 +1,5 @@
 const ROTATION_DEGREES_DELTA = 0.5
+const BOUNDS_DESTRUCTION_DELTA = 1.0
 
 class Asteroid extends GameObject {
 
@@ -19,7 +20,7 @@ class Asteroid extends GameObject {
         let cameraZ = engine.camera.center[2]
         
         // Add delta to avoid destroying in front of players faces
-        if (cameraZ < this.translation[2] + 1.0) {
+        if (cameraZ < this.translation[2] + BOUNDS_DESTRUCTION_DELTA) {
             this.destroy()
         }
     }
