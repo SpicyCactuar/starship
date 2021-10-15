@@ -17,10 +17,7 @@ class Starship extends GameObject {
         
         this.addMovementEventListeners()
 
-		// TODO: Remove when using definitive model
 		this.initialRotations = [0.0, 0.0, 0.0]
-		//this.setRotation(this.initialRotations[0], this.initialRotations[1], this.initialRotations[2])
-		//this.setScale(0.5, 0.5, 0.5)
 
 		this.shootCooldown = 0
 		// (-1) is left, (+1) is right, 0 is no roll
@@ -102,8 +99,6 @@ class Starship extends GameObject {
 
 	calculateRollRotations() {
 		// Reset X and Y rotations
-		let rotX = this.initialRotations[0]
-		let rotY = this.initialRotations[1]
 		// Process Roll rotation step
 		let rotZ = this.rotations[2] + ROLL_ROTATION_SPEED * this.barrelRollDirection
 
@@ -113,7 +108,7 @@ class Starship extends GameObject {
 			this.barrelRollDirection = 0
 		}
 
-		return [ rotX, rotY, rotZ ]
+		return [ 0.0, 0.0, rotZ ]
 	}
 
 	calculateCartesianRotations(speedX, speedY) {
@@ -202,14 +197,14 @@ class Starship extends GameObject {
         let starshipDrawer = new ObjectDrawer(cameraMatrices.mvp, cameraMatrices.mv)
 
         let mesh = new ObjectMesh()
-        mesh.load("./models/PawShip.obj")
+        mesh.load("./models/pawship.obj")
         starshipDrawer.setMesh(mesh)
 
         let starshipImage = new Image()
         starshipImage.onload = function() {
             starshipDrawer.setTexture(starshipImage)
         }
-        starshipImage.src = "./textures/BaseColor.jpg"
+        starshipImage.src = "./textures/pawship.jpg"
 
         return new Starship(starshipDrawer)
     }
