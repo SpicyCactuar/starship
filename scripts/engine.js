@@ -6,6 +6,10 @@ class Engine {
         this.camera = new Camera()
     }
 
+    initializeScene() {
+        this.scene = Scene.create(this.camera)
+    }
+
     onObjectCreated(gameObject) {
         if (gameObject.collider) {
             this.collidables.push(gameObject)
@@ -18,6 +22,10 @@ class Engine {
             this.removeElement(gameObject, this.collidables)
         }
         this.removeElement(gameObject, this.drawables)
+        
+        if (gameObject.name == "starship") {
+            this.stop()
+        }
     }
 
     removeElement(element, list) {
@@ -27,11 +35,7 @@ class Engine {
         }
     }
 
-    initializeScene() {
-        this.scene = Scene.create(this.camera)
-    }
-
-    startGameLoop() {
+    run() {
         let engine = this
         setInterval(function() {
             engine.updateScene()
@@ -41,6 +45,10 @@ class Engine {
         setTimeout(function() {
             engine.scene.start()
         }, 1500)
+    }
+
+    stop() {
+        this.scene.stop()
     }
 
     updateScene() {

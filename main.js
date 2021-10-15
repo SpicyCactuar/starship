@@ -10,9 +10,9 @@ var engine = new Engine()
 // When window loads, perform all steps to initialize & draw the WebGL scene
 window.onload = async function() {
 	initializeWebGL()
-    engine.initializeScene()
+	engine.initializeScene()
     updateCanvasSize()
-	engine.startGameLoop()
+	engine.run()
 }
 
 // Initializes canvas & webGl context

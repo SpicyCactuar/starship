@@ -1,6 +1,5 @@
 # TODO
 
-- Implement gameplay
 - Implement DEBUG mode
 - Wait for resource loading before starting game loop & show loading feedback
 - Unify code style

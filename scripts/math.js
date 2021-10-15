@@ -73,3 +73,7 @@ function epsilonSubstract(a, b, epsilon) {
 
     return Math.abs(result) < epsilon ? 0.0 : result
 }
+
+function randomSign() {
+    return Math.random() < 0.5 ? -1 : 1
+}
