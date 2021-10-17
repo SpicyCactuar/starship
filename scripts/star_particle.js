@@ -9,8 +9,8 @@ class StarParticle {
         this.prog = createShaderProgram(starsVS, starsFS)
         
         this.mvpLoc = gl.getUniformLocation(this.prog, 'mvp')
-        this.cameraDepthLoc = gl.getUniformLocation(this.prog, 'cameraDepth')
 		this.posLoc = gl.getAttribLocation(this.prog, 'pos')
+        this.alphaLoc = gl.getUniformLocation(this.prog, 'alpha')
 		this.positionBuffer = gl.createBuffer()
 
         this.camera = camera
@@ -53,8 +53,10 @@ class StarParticle {
 
 		gl.useProgram(this.prog)
 		gl.uniformMatrix4fv(this.mvpLoc, false, transformedMvp)
-        gl.uniform1f(this.cameraDepthLoc, this.camera.center[2])
-        // console.log(this.position[2], this.camera.center[2])
+
+        let delta = Math.abs(this.position[2] - this.camera.center[2]) - 3.0
+        let alpha = clamp(delta, 0.0, 5.0) / 5.0
+        gl.uniform1f(this.alphaLoc, alpha)
 	}
 
 	draw() {
@@ -92,12 +94,9 @@ var starsVS = `
     uniform mat4 mvp;
 
 	attribute vec3 pos;
-
-    varying float vertDepth;
 	
 	void main() {
 		gl_Position = mvp * vec4(pos, 1.0);
-        vertDepth = gl_Position[2];
 	}
 `;
 
@@ -105,13 +104,9 @@ var starsVS = `
 var starsFS = `
 	precision mediump float;
 
-    uniform float cameraDepth;
-
-    varying float vertDepth;
+    uniform float alpha;
 
 	void main() {
-        float delta = abs(vertDepth - cameraDepth);
-        float alpha = clamp(delta, 0.0, 5.0) / 5.0;
 		gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
 	}
 `;
