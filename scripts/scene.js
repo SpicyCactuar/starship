@@ -7,7 +7,7 @@ class Scene {
         this.starship.setTranslation(0.0, 0.0, -5.0)
 
         this.stars = Stars.create(this.camera, cameraMatrices)
-        this.stars.setAmount(90)
+        this.stars.setAmount(75)
 
         this.asteroids = new Asteroids(this.camera, this.starship)
     }

@@ -44,7 +44,7 @@ class Engine {
 
         setTimeout(function() {
             engine.scene.start()
-        }, 1500)
+        }, 1600)
     }
 
     stop() {
