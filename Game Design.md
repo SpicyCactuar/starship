@@ -16,10 +16,9 @@
     - Random model + size (0.9 - 1.1 scale)
 - Particles
     - Stars
-    - Propulsion
-    - Explosion
-    - Debris
-- Background
+    - Propulsion [PENDING]
+    - Explosion [PENDING]
+- Background [PENDING]
 
 ## Extra
 
@@ -34,5 +33,5 @@
 
 - Starship Model
 - Asteroid/s Models (could be procedural)
-- Backround
+- Background
 - Sounds
