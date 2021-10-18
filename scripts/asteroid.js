@@ -30,6 +30,7 @@ class Asteroid extends GameObject {
 
         if (otherGameObject.name == "laser") {
             this.destroy()
+            otherGameObject.destroy()
         }
     }
 
