@@ -23,18 +23,32 @@ class GameObject {
 			this.translation[0], this.translation[1], this.translation[2], 1.0
 		]
 		
-		this.collider.updateWorldTransform(worldTransform)
-        this.drawer.updateWorldTransform(worldTransform)
+		if (this.collider){
+			this.collider.updateWorldTransform(worldTransform)
+		}		
+		if (this.drawer){
+			this.drawer.updateWorldTransform(worldTransform)
+		}        
+
+		return worldTransform
 	}
 
 	onModelViewProjectionUpdated(mvp, mv) {
-		this.collider.onModelViewProjectionUpdated(mvp)
-		this.drawer.onModelViewProjectionUpdated(mvp, mv)
+		if (this.collider){
+			this.collider.onModelViewProjectionUpdated(mvp)
+		}
+		if (this.drawer){
+			this.drawer.onModelViewProjectionUpdated(mvp, mv)
+		}
 	}
 
     draw() {
-        this.drawer.draw()
-		this.collider.draw()
+		if (this.drawer){
+        	this.drawer.draw()
+		}
+		if (this.collider){
+			this.collider.draw()
+		}		
     }
 
     update() {}

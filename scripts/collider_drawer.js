@@ -29,18 +29,24 @@ class ColliderDrawer {
     }
 
 	onModelViewProjectionUpdated(mvp) {
+        if (!engine.debugMode) return;
+        
 		this.mvp = mvp
 
         this.updateShaderMvp()
 	}
 
     updateWorldTransform(worldTransform) {	
+        if (!engine.debugMode) return;
+
         this.worldTransform = worldTransform
 
         this.updateShaderMvp()
 	}
 
     updateShaderMvp() {
+        if (!engine.debugMode) return;
+
         if (this.mvp == null || this.worldTransform == null) return
 
         let newMVP = matrixMultiply(this.mvp, this.worldTransform)
@@ -51,6 +57,8 @@ class ColliderDrawer {
     }
 	
 	draw() {
+        if (!engine.debugMode) return;
+
 		gl.useProgram(this.prog);
         // Enables position attribute as a vec3
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);

@@ -23,7 +23,7 @@ class Asteroids {
         let x = this.starship.translation[0] + randomSign() * Math.random() * STARSHIP_HORIZONTAL_DELTA
         let y = this.starship.translation[1] + randomSign() * Math.random() * STARSHIP_HORIZONTAL_DELTA
         let z = this.starship.translation[2] - STARSHIP_DEPTH_DELTA
-        let scale = clamp(Math.random() * 0.2, 0.1, 0.2)
+        let scale = clamp(Math.random() * 0.3, 0.2, 0.3)
 
         let asteroid = Asteroid.create(cameraMatrices)
         asteroid.setTranslation(x, y, z)

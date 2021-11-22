@@ -1,4 +1,4 @@
-const LASER_SPEED = STARSHIP_SPEED + 0.3
+const LASER_SPEED = STARSHIP_SPEED + 0.5
 const LASER_TTL = 1.5
 
 class Laser extends GameObject {
@@ -6,8 +6,8 @@ class Laser extends GameObject {
     constructor(stageDrawer, direction) {
         super(stageDrawer, "laser")
         // TODO: Change/remove when using actual model
-        this.scale = [0.2, 0.2, 3.0]
-        this.collider = new Collider([0.0, 0.0, 0.0], 0.3, 0.3, 0.3)
+        this.scale = [0.1, 0.1, 3.5]
+        this.collider = new Collider([0.0, 0.0, 0.0], 0.5, 0.5, 0.5)
         this.speed = LASER_SPEED
         this.direction = direction
         this.ttl = LASER_TTL

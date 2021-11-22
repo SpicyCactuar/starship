@@ -13,7 +13,9 @@ class Starship extends GameObject {
 		this.propelling = false
 		this.attachedCamera = null
 		
-		this.collider = new Collider([0.0, 0.0, 0.0], 1.0, 0.5, 2.0)
+		this.collider = new Collider([0.0, 0.0, 0.0], 0.8, 0.3, 1.0)
+
+		this.colliderStartingSize = [this.collider.halfWidth * 2.0, this.collider.halfHeight * 2.0, this.collider.halfDepth * 2.0]
         
         this.addMovementEventListeners()
 
@@ -23,6 +25,9 @@ class Starship extends GameObject {
 		// (-1) is left, (+1) is right, 0 is no roll
 		this.barrelRollDirection = 0
 		this.lastSideKey = this.rightKey
+
+		this.fireEmitter = new FireParticleEmitter([0.0, 0.0, 1.0])
+		this.barrelRollEffect = new ParticleEmitter([0.0, 0.0, 0.0])
     }
 
     addMovementEventListeners() {
@@ -43,6 +48,10 @@ class Starship extends GameObject {
 			} else if (event.key == "z") {
 				starship.barrelRoll()
 			}
+
+			if (event.key == "Escape") {
+				engine.debugMode = !engine.debugMode
+			}
 		})
 		document.addEventListener('keyup', function(event) {
 			if (event.key == "ArrowLeft") {
@@ -62,6 +71,29 @@ class Starship extends GameObject {
 		this.moveBy(speedX, speedY, speedZ)
 		this.rotateSmoothlyBy(speedX, speedY)
 		this.updateShootCooldown()
+
+		this.barrelRollEffect.update()	
+		this.fireEmitter.update()
+	}
+
+	updateWorldTransform(){
+		let worldTransform = super.updateWorldTransform()
+		if (this.barrelRollEffect){
+			this.barrelRollEffect.updateWorldTransform(worldTransform)
+		}
+		if (this.fireEmitter){
+			this.fireEmitter.updateWorldTransform(worldTransform)
+		}
+	}
+	
+	draw(){
+		super.draw()
+		if (this.barrelRollEffect){
+			this.barrelRollEffect.draw()
+		}
+		if (this.fireEmitter){
+			this.fireEmitter.draw()
+		}
 	}
 
 	calculatePerAxisSpeed() {
@@ -94,6 +126,8 @@ class Starship extends GameObject {
 			[ rotX, rotY, rotZ ] = this.calculateCartesianRotations(speedX, speedY)
 		}
 
+		this.fireEmitter.setRotation(rotY / 360.0, -rotX / 360.0)
+
 		this.setRotation(rotX, rotY, rotZ)
 	}
 
@@ -106,6 +140,8 @@ class Starship extends GameObject {
 		if (Math.abs(rotZ) >= 360) {
 			rotZ = 0
 			this.barrelRollDirection = 0
+			// Reset Collider
+			this.collider.setSize(this.colliderStartingSize[0], this.colliderStartingSize[1], this.colliderStartingSize[2])
 		}
 
 		return [ 0.0, 0.0, rotZ ]
@@ -134,7 +170,10 @@ class Starship extends GameObject {
 	barrelRoll() {
 		if (this.isBarrelRolling()) return
 
+		this.barrelRollEffect.emit()
+		
 		this.barrelRollDirection = (this.lastSideKey == "ArrowLeft" ? 1.0 : -1.0)
+		this.collider.setSize(0, 0, 0)
 	}
 
 	isBarrelRolling() {
@@ -172,7 +211,7 @@ class Starship extends GameObject {
 		laser.setRotation(laser.rotations[0] + rotX, laser.rotations[1] + rotY, laser.rotations[2])
 		laser.setTranslation(
 			this.translation[0] + laserDirection[0] * LASER_FORWARD_SPAWN_DELTA,
-			this.translation[1] + laserDirection[1] * LASER_FORWARD_SPAWN_DELTA + 0.35,
+			this.translation[1] + laserDirection[1] * LASER_FORWARD_SPAWN_DELTA,
 			this.translation[2] + laserDirection[2] * LASER_FORWARD_SPAWN_DELTA
 		)
 	}
@@ -190,6 +229,7 @@ class Starship extends GameObject {
 
 		if (otherGameObject.name == "asteroid") {
 			this.destroy()
+			otherGameObject.emitter.emit()
 		}
 	}
 

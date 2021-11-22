@@ -59,6 +59,13 @@ class Collider {
             (thisMinZ <= otherMaxZ && thisMaxZ >= otherMinZ)
     }
 
+    setSize(width, height, depth){
+        this.halfWidth = width / 2.0
+        this.halfHeight = height / 2.0
+        this.halfDepth = depth / 2.0
+
+        this.drawer.setColliderData(this)
+    }
 
 
     getFacesBuffer() {

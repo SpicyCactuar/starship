@@ -13,6 +13,11 @@
 	<script type="text/javascript" src="scripts/object_mesh.js"></script>
 	<script type="text/javascript" src="scripts/object_drawer.js"></script>
 	<script type="text/javascript" src="scripts/game_object.js"></script>
+	<script type="text/javascript" src="scripts/particle_emitter.js"></script>
+	<script type="text/javascript" src="scripts/particle_system_drawer.js"></script>
+	<script type="text/javascript" src="scripts/fire_emitter.js"></script>
+	<script type="text/javascript" src="scripts/explosion_emitter.js"></script>
+	<script type="text/javascript" src="scripts/particle.js"></script>
 	<script type="text/javascript" src="scripts/asteroids.js"></script>
 	<script type="text/javascript" src="scripts/scene.js"></script>
 	<script type="text/javascript" src="scripts/stars.js"></script>
@@ -21,15 +26,19 @@
 	<script type="text/javascript" src="scripts/starship.js"></script>
 	<script type="text/javascript" src="scripts/laser.js"></script>
 	<script type="text/javascript" src="scripts/camera.js"></script>
-	<script type="text/javascript" src="scripts/math.js"></script>
-	<script type="text/javascript" src="main.js"></script>
+	<script type="text/javascript" src="scripts/math.js"></script>	
 	
 	</head>
 	<body onresize="windowResize()">
-		<div id="canvas-div">
-			<canvas id="canvas">
+		<div id="container">
+			<canvas id="canvas", style="background:black;">
 			</canvas>
+			<div id="overlay", style="position: absolute; left: 16px; top: 16px; background-color: rgba(0, 0, 0, 0.7); color: white; font-size: 40px; font-family: fantasy">
+				<div>Score: <span id="score"></span></div>
+			</div>
 		</div>
 	</body>
+
+	<script type="text/javascript" src="main.js"></script>
 	</html>
 </doctype>
