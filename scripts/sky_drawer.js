@@ -156,7 +156,7 @@ var SkyFS = `
         tex.a = step(0.5, tex.x);
         tex *= tex.a;
         tex = tex * pct;
-        tex *= 0.05;
+        tex *= 0.25;
 
         vec4 col = vec4(hsv2rgb(vec3(u_time * 0.01, 1.0, 1.0)), 1.0);
         tex = tex * col;

@@ -53,16 +53,12 @@ class FireParticleEmitter extends ParticleEmitter {
             part.acceleration = [0.0, 0.0, 0.0]
             part.rotationSpeed = [0.0, 0.0, 0.0]
 
-            //part.scaleSpeed = [-0.05, -0.05, -0.05]
-
             part.maxLife = 0.15
             part.life = 0.15
-            //part.alpha = 0.6
             part.lifeAsAlpha = false;
             part.lifeAsScale = true;
             part.id = this.current_id;
             this.current_id = (this.current_id + 1) % 1000;
-            //part.alphaReduction = 0.008;
 
             part.colorTint = [0.0, 0.0, 1.0]
 

@@ -72,7 +72,7 @@ class Engine {
         })
     
         engine.collidables.forEach(function(collidable) {
-            if ((collidable.collider === null) || (collidable.collider === null)) return;
+            if ((collidable === null) || (collidable.collider === null)) return;
             
             engine.collidables.forEach(function(otherCollidable) {
                 if ((otherCollidable === null) || (otherCollidable.collider == null)) return;
