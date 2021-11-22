@@ -3,6 +3,9 @@ class Scene {
     constructor(camera, cameraMatrices) {
         this.camera = camera
 
+        this.sky = new SkyDrawer()
+        engine.drawables.push(this.sky)
+
         this.starship = Starship.create(cameraMatrices)
         this.starship.setTranslation(0.0, 0.0, -5.0)
 
