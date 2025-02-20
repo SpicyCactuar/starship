@@ -1,12 +1,21 @@
 # Starship
 
+Jointly developed with [Remruts](https://github.com/Remruts/).
+
+![starship](https://user-images.githubusercontent.com/7926479/209482947-4c46be47-fd97-447e-bec6-9a0ba284c646.png)
+
 Infinite 3D Asteroids-like game. The player controls a ship that infinitely moves forward dodging & shooting asteroids. The game ends when the ship is hit.
 
 Final project for the [Fundamentals of Computer Graphics subject](https://campus.exactas.uba.ar/course/view.php?id=2433) of the University of Buenos Aires. The game is run by a minimal ad-hoc engine written in Javascript and leveraging WebGL.
 
- Co-developed with [Remruts](https://github.com/Remruts/). 
+## Features
 
-![starship](https://user-images.githubusercontent.com/7926479/209482947-4c46be47-fd97-447e-bec6-9a0ba284c646.png)
+* WebGL graphics pipeline:
+  * Rasterizer
+  * Directional lightning
+  * .obj model renderer
+* AABB collisions, visual representations of the boxes are shown
+* Simple object pooling (stars)
 
 ## Project Structure
 
@@ -37,12 +46,3 @@ Game is started automatically. Restart the tab to play again.
 | `↑` / `↓` / `←` / `→`     | Orient ship around Z axis                                        |
 | `Spacebar`                | Shoot laser                                                      |
 | `Z`                       | Do a barrel roll                                                 |
-
-## Features
-
-* WebGL graphics pipeline:
-  * Rasterizer
-  * Directional lightning
-  * .obj model renderer
-* AABB collisions, visual representations of the boxes are shown
-* Simple object pooling (stars)
